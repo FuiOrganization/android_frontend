@@ -1,10 +1,12 @@
 package br.com.fui.fuiapplication;
 
+import java.io.Serializable;
+
 /**
  * Created by guilherme on 19/09/17.
  */
 
-public class Experience {
+public class Experience implements Serializable {
     private String title;
     private String description;
     private Integer imageId;

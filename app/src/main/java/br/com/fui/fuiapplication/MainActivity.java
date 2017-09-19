@@ -1,5 +1,6 @@
 package br.com.fui.fuiapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -15,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
     private GridView gridRecommendations;
+    private Intent experienceIntent;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -47,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //intent for experience
+        experienceIntent = new Intent(this, ExperienceActivity.class);
+
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -57,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
         gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                //
+                experienceIntent.putExtra("experience", (Experience) gridRecommendations.getAdapter().getItem(position));
+                startActivity(experienceIntent);
             }
         });
     }
