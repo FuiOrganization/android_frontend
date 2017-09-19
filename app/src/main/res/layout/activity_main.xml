@@ -24,6 +24,18 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:text="@string/title_home" />
 
+        <GridView
+            android:id="@+id/grid_recommendations"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnWidth="90dp"
+            android:numColumns="2"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
+            android:stretchMode="columnWidth"
+            android:gravity="center" >
+        </GridView>
+
     </FrameLayout>
 
     <android.support.design.widget.BottomNavigationView
