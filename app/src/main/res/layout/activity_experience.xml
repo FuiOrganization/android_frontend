@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="br.com.fui.fuiapplication.ExperienceActivity">
+    tools:context="br.com.fui.fuiapplication.activities.ExperienceActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -49,11 +49,11 @@
         android:id="@+id/fui_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginRight="70dp"
+        android:layout_gravity="center"
+        android:layout_marginRight="75dp"
         app:backgroundTint="@android:color/holo_blue_dark"
-        app:layout_anchor="@id/favorite_button"
-        app:layout_anchorGravity="left"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|end"
         app:rippleColor="@android:color/background_light"
         app:srcCompat="@drawable/ic_fui_button" />
 

@@ -1,4 +1,4 @@
-package br.com.fui.fuiapplication;
+package br.com.fui.fuiapplication.models;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -8,8 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import br.com.fui.fuiapplication.R;
 
 /**
  * Created by guilherme on 19/09/17.

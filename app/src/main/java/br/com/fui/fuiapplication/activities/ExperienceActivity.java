@@ -1,7 +1,6 @@
-package br.com.fui.fuiapplication;
+package br.com.fui.fuiapplication.activities;
 
 import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -12,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
+
+import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.models.Experience;
 
 public class ExperienceActivity extends AppCompatActivity {
 
@@ -31,6 +33,16 @@ public class ExperienceActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        FloatingActionButton fui_button = (FloatingActionButton) findViewById(R.id.fui_button);
+        fui_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 

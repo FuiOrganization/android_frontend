@@ -1,4 +1,4 @@
-package br.com.fui.fuiapplication;
+package br.com.fui.fuiapplication.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +10,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.models.Experience;
+import br.com.fui.fuiapplication.models.ImageAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         experienceIntent = new Intent(this, ExperienceActivity.class);
 
         mTextMessage = (TextView) findViewById(R.id.message);
+        mTextMessage.setVisibility(View.INVISIBLE);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 

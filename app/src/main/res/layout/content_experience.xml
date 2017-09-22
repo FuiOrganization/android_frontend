@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="br.com.fui.fuiapplication.ExperienceActivity"
+    tools:context="br.com.fui.fuiapplication.activities.ExperienceActivity"
     tools:showIn="@layout/activity_experience">
 
     <TextView

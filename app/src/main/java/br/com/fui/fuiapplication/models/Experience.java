@@ -1,4 +1,4 @@
-package br.com.fui.fuiapplication;
+package br.com.fui.fuiapplication.models;
 
 import java.io.Serializable;
 
