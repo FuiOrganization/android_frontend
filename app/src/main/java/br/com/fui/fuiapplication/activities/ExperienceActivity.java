@@ -1,6 +1,9 @@
 package br.com.fui.fuiapplication.activities;
 
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ClipboardManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -43,6 +46,19 @@ public class ExperienceActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton ShareButton = (FloatingActionButton) findViewById(R.id.ShareButton);
+        ShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Link de compartilhamento copiado com sucesso!", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                String URL = "Confira esse Lugar! Fui! https://www.FuiApp.com/AlgumLocalDahora";
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("", URL);
+                clipboard.setPrimaryClip(clip);
+            }
+        });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -59,5 +75,12 @@ public class ExperienceActivity extends AppCompatActivity {
         }else{
             appBar.setBackgroundDrawable(ContextCompat.getDrawable(this, experience.getImageId()));
         }
+    }
+
+    public void botaoShareClicado(View view) {
+        String URL = "https://www.FuiApp.com/AlgumLocalDahora";
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("Link para compartilhamento copiado com sucesso!", URL);
+        clipboard.setPrimaryClip(clip);
     }
 }
