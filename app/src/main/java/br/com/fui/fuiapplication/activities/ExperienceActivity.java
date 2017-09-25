@@ -76,11 +76,4 @@ public class ExperienceActivity extends AppCompatActivity {
             appBar.setBackgroundDrawable(ContextCompat.getDrawable(this, experience.getImageId()));
         }
     }
-
-    public void botaoShareClicado(View view) {
-        String URL = "https://www.FuiApp.com/AlgumLocalDahora";
-        android.content.ClipboardManager clipboard = (android.content.ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-        android.content.ClipData clip = android.content.ClipData.newPlainText("Link para compartilhamento copiado com sucesso!", URL);
-        clipboard.setPrimaryClip(clip);
-    }
 }
