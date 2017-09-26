@@ -20,6 +20,8 @@ import br.com.fui.fuiapplication.models.Experience;
 
 public class ExperienceActivity extends AppCompatActivity {
 
+    private Experience experience;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +29,9 @@ public class ExperienceActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         AppBarLayout appBar = (AppBarLayout) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+
+        Intent i = getIntent();
+        experience = (Experience) i.getSerializableExtra("experience");
 
         FloatingActionButton favorite_button = (FloatingActionButton) findViewById(R.id.favorite_button);
         favorite_button.setOnClickListener(new View.OnClickListener() {
@@ -46,13 +51,16 @@ public class ExperienceActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton ShareButton = (FloatingActionButton) findViewById(R.id.ShareButton);
-        ShareButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton share_button = (FloatingActionButton) findViewById(R.id.share_button);
+        share_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Link de compartilhamento copiado com sucesso!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                String URL = "Confira esse Lugar! Fui! https://www.FuiApp.com/AlgumLocalDahora";
+                Snackbar.make(view, R.string.share_experience_success_message, Snackbar.LENGTH_LONG)
+                        .setAction("share_link_action", null).show();
+                String URL = getString(R.string.share_experience_checkout_message) +
+                        " " +
+                        "https://www.fuiapp.com/" +
+                        experience.getTitle().replace(' ', '_');
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("", URL);
                 clipboard.setPrimaryClip(clip);
@@ -60,10 +68,6 @@ public class ExperienceActivity extends AppCompatActivity {
         });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
-        Intent i = getIntent();
-        Experience experience = (Experience) i.getSerializableExtra("experience");
 
         TextView description = (TextView) findViewById(R.id.experience_description);
         description.setText(experience.getDescription());

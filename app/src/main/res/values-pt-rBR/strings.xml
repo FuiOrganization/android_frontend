@@ -3,4 +3,6 @@
     <string name="title_home">Home</string>
     <string name="title_favorites">Favoritos</string>
     <string name="title_history">Histórico</string>
+    <string name="share_experience_success_message">Link de compartilhamento copiado com sucesso!</string>
+    <string name="share_experience_checkout_message">Confira esse Lugar! Fui!</string>
 </resources>
