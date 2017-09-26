@@ -67,6 +67,6 @@
         app:backgroundTint="@android:color/holo_red_light"
         app:layout_anchor="@+id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="?android:attr/actionModeShareDrawable" />
+        app:srcCompat="@drawable/ic_share" />
 
 </android.support.design.widget.CoordinatorLayout>
