@@ -70,7 +70,7 @@ public class ImageAdapter extends BaseAdapter {
             sponsorship = new TextView(mContext);
             sponsorship.setBackgroundColor(Color.parseColor("#d40000"));
             sponsorship.setWidth(150);
-            sponsorship.setHeight(40);
+            sponsorship.setHeight(60);
             sponsorship.setTextColor(Color.parseColor("#ffffff"));
             sponsorship.setGravity(Gravity.CENTER);
             sponsorship.setLayoutParams(relativeLayoutParams);
