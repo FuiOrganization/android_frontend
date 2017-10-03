@@ -6,6 +6,7 @@
     <string name="title_activity_experience">ExperienceActivity</string>
     <string name="share_experience_success_message">Share link successfully copied!</string>
     <string name="share_experience_checkout_message">Check out this place!</string>
+    <string name="sponsored_label">Sponsored</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
