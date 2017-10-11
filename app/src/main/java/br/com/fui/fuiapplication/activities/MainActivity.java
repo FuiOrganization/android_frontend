@@ -1,15 +1,20 @@
 package br.com.fui.fuiapplication.activities;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
+
 
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.models.Experience;
@@ -52,7 +57,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //close loginActivity
         setResult(RESULT_OK);
+
+        ActionBar actionBar = getSupportActionBar();
+        //custom action bar with logo
+        actionBar.setCustomView(R.layout.action_bar);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
         //intent for experience
         experienceIntent = new Intent(this, ExperienceActivity.class);
