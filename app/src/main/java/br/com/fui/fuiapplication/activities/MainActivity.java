@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setResult(RESULT_OK);
+
         //intent for experience
         experienceIntent = new Intent(this, ExperienceActivity.class);
 
