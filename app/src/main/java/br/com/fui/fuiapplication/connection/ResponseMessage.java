@@ -1,4 +1,4 @@
-package br.com.fui.fuiapplication.auth;
+package br.com.fui.fuiapplication.connection;
 
 /**
  * Created by guilherme on 19/07/17.

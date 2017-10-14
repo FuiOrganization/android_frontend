@@ -1,7 +1,5 @@
-package br.com.fui.fuiapplication.auth;
+package br.com.fui.fuiapplication.connection;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -28,7 +26,7 @@ public class Connection {
     //timeout in milliseconds
     private static final int timeout = 5000;
     private static final String c9IP = "";
-    private static final String localIP = "";
+    private static final String localIP = "191.251.155.111:3000";
     private static String serverIP = c9IP;
     private static String token = "";
     private static boolean validToken = false;

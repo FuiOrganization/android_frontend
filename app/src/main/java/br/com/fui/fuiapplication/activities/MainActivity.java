@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.models.Experience;
 import br.com.fui.fuiapplication.models.ImageAdapter;
 
@@ -73,8 +74,11 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        //get recommendations
+        Experience recommendations[] = ExperienceConnector.getRecommendations();
+
         gridRecommendations= (GridView) findViewById(R.id.grid_recommendations);
-        gridRecommendations.setAdapter(new ImageAdapter(this));
+        gridRecommendations.setAdapter(new ImageAdapter(this, recommendations));
 
         gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,

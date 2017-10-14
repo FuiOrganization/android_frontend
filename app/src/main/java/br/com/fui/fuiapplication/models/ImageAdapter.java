@@ -22,8 +22,9 @@ import br.com.fui.fuiapplication.R;
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
 
-    public ImageAdapter(Context c) {
+    public ImageAdapter(Context c, Experience recommendations[]) {
         mContext = c;
+        this.experiences = recommendations;
     }
 
     public int getCount() {
