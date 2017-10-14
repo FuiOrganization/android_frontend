@@ -26,8 +26,8 @@ public class Connection {
     //timeout in milliseconds
     private static final int timeout = 5000;
     private static final String c9IP = "";
-    private static final String localIP = "191.251.155.111:3000";
-    private static String serverIP = c9IP;
+    private static final String localIP = "http://192.168.25.87:3000/";
+    private static String serverIP = localIP;
     private static String token = "";
     private static boolean validToken = false;
 
@@ -56,14 +56,19 @@ public class Connection {
             connection.connect();
 
             DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(info.toString());
+            if(info!=null){
+                wr.writeBytes(info.toString());
+            }else{
+                wr.writeBytes("");
+            }
+
             wr.flush();
             wr.close();
 
             BufferedReader br;
 
-            //Log.d("request", connection.getResponseCode() + "");
-            //Log.d("request", connection.getResponseMessage());
+            Log.d("request_fui", connection.getResponseCode() + "");
+            Log.d("request_fui", connection.getResponseMessage());
 
             // checks if response code is ok or an error code
             if (200 <= connection.getResponseCode() && connection.getResponseCode() <= 299) {

@@ -75,9 +75,9 @@ public class ExperienceActivity extends AppCompatActivity {
         setTitle(experience.getTitle());
 
         if (Build.VERSION.SDK_INT >= 16){
-            appBar.setBackground(ContextCompat.getDrawable(this, experience.getImageId()));
+            //appBar.setBackground(ContextCompat.getDrawable(this, experience.getImage()));
         }else{
-            appBar.setBackgroundDrawable(ContextCompat.getDrawable(this, experience.getImageId()));
+            //appBar.setBackgroundDrawable(ContextCompat.getDrawable(this, experience.getImage()));
         }
     }
 }

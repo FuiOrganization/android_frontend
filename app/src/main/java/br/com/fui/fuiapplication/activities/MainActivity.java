@@ -2,13 +2,13 @@ package br.com.fui.fuiapplication.activities;
 
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
     private GridView gridRecommendations;
     private Intent experienceIntent;
+    private Experience[] recommendations = {};
+    private GetRecommendations getRecommendationsTask;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -74,10 +76,11 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        //get recommendations
-        Experience recommendations[] = ExperienceConnector.getRecommendations();
+        getRecommendationsTask = new GetRecommendations();
+        getRecommendationsTask.execute((Void) null);
 
         gridRecommendations= (GridView) findViewById(R.id.grid_recommendations);
+
         gridRecommendations.setAdapter(new ImageAdapter(this, recommendations));
 
         gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -87,6 +90,30 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(experienceIntent);
             }
         });
+    }
+
+    public class GetRecommendations extends AsyncTask<Void, Void, Experience[]> {
+
+        GetRecommendations(){
+        }
+
+        @Override
+        protected Experience[] doInBackground(Void... voids) {
+            //get recommendations
+            Experience recommendations[] = ExperienceConnector.getRecommendations();
+            return recommendations;
+        }
+
+        @Override
+        protected void onPostExecute(final Experience[] recommendations){
+            MainActivity.this.recommendations = recommendations;
+            MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, MainActivity.this.recommendations));
+        }
+
+        @Override
+        protected void onCancelled(){}
+
+
     }
 
 }

@@ -9,13 +9,13 @@ import java.io.Serializable;
 public class Experience implements Serializable {
     private String title;
     private String description;
-    private Integer imageId;
+    private String image;
     private boolean sponsored;
 
-    public Experience(String title, String description, Integer imageId, boolean sponsored) {
+    public Experience(String title, String description, String image, boolean sponsored) {
         this.title = title;
         this.description = description;
-        this.imageId = imageId;
+        this.image = image;
         this.sponsored = sponsored;
     }
 
@@ -43,11 +43,11 @@ public class Experience implements Serializable {
         this.description = description;
     }
 
-    public Integer getImageId() {
-        return imageId;
+    public String getImage() {
+        return image;
     }
 
-    public void setImageId(Integer imageId) {
-        this.imageId = imageId;
+    public void setImage(String image) {
+        this.image = image;
     }
 }
