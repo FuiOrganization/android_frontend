@@ -2,23 +2,22 @@ package br.com.fui.fuiapplication.activities;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.util.LruCache;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
-
-import java.io.File;
-
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.models.Experience;
 import br.com.fui.fuiapplication.models.ImageAdapter;
@@ -30,12 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private Intent experienceIntent;
     private Experience[] recommendations = {};
     private GetRecommendations getRecommendationsTask;
-
-    // Disk Cache parameters
-    private final Object mDiskCacheLock = new Object();
-    private boolean mDiskCacheStarting = true;
-    private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
-    private static final String DISK_CACHE_SUBDIR = "thumbnails";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -71,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         //close loginActivity
         setResult(RESULT_OK);
 
+        MemoryCache.start();
+
         ActionBar actionBar = getSupportActionBar();
         //custom action bar with logo
         actionBar.setCustomView(R.layout.action_bar);
@@ -87,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         getRecommendationsTask = new GetRecommendations();
         getRecommendationsTask.execute((Void) null);
 
-        gridRecommendations= (GridView) findViewById(R.id.grid_recommendations);
+        gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
 
         gridRecommendations.setAdapter(new ImageAdapter(this, recommendations));
 
@@ -102,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
     public class GetRecommendations extends AsyncTask<Void, Void, Experience[]> {
 
-        GetRecommendations(){
+        GetRecommendations() {
         }
 
         @Override
@@ -113,16 +108,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(final Experience[] recommendations){
+        protected void onPostExecute(final Experience[] recommendations) {
             MainActivity.this.recommendations = recommendations;
             MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, MainActivity.this.recommendations));
         }
 
         @Override
-        protected void onCancelled(){}
+        protected void onCancelled() {
+        }
 
 
     }
+
+
 
 
 }

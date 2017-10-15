@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import br.com.fui.fuiapplication.cache.MemoryCache;
+
 /**
  * Created by guilherme on 14/10/17.
  */
@@ -37,8 +39,14 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
     protected Bitmap doInBackground(Void... voids) {
         Bitmap bitmap = null;
         try {
-            bitmap = BitmapFactory.decodeStream((InputStream) new URL(this.imageUrl).getContent());
-            Log.d("bitmap", bitmap.toString());
+            //try to get bitmap from memory cache
+            bitmap = MemoryCache.getBitmapFromMemCache(this.imageUrl);
+            //if null, load from stream
+            if (bitmap == null) {
+                bitmap = BitmapFactory.decodeStream((InputStream) new URL(this.imageUrl).getContent());
+                //add to memory cache
+                MemoryCache.addBitmapToMemoryCache(this.imageUrl, bitmap);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,13 +55,13 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(final Bitmap image) {
-        if(imageView != null){
+        if (imageView != null) {
             imageView.setImageBitmap(image);
-        }else if(appBar != null){
+        } else if (appBar != null) {
             Drawable drawableImage = new BitmapDrawable(image);
-            if (Build.VERSION.SDK_INT >= 16){
+            if (Build.VERSION.SDK_INT >= 16) {
                 appBar.setBackground(drawableImage);
-            }else{
+            } else {
                 appBar.setBackgroundDrawable(drawableImage);
             }
 
