@@ -16,6 +16,8 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 
+import java.io.File;
+
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.models.Experience;
@@ -28,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private Intent experienceIntent;
     private Experience[] recommendations = {};
     private GetRecommendations getRecommendationsTask;
+
+    // Disk Cache parameters
+    private final Object mDiskCacheLock = new Object();
+    private boolean mDiskCacheStarting = true;
+    private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
+    private static final String DISK_CACHE_SUBDIR = "thumbnails";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -115,5 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 }

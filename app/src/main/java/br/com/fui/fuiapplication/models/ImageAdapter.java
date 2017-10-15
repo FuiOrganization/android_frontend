@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 /**
  * Created by guilherme on 19/09/17.
@@ -161,8 +162,8 @@ public class ImageAdapter extends BaseAdapter {
         }
 
         //set image and title on asynctask
-        LoadImage loadImageTask = new LoadImage(experiences[position].getImage(), experienceImage);
-        loadImageTask.execute((Void) null);
+        LoadImageTask loadImageTaskTask = new LoadImageTask(experiences[position].getImage(), experienceImage);
+        loadImageTaskTask.execute((Void) null);
         experienceTitle.setText(experiences[position].getTitle());
         //if is sponsored, add label
         if (experiences[position].isSponsored()) {
@@ -170,40 +171,6 @@ public class ImageAdapter extends BaseAdapter {
         }
 
         return linearLayout;
-    }
-
-    public class LoadImage extends AsyncTask<Void, Void, Bitmap> {
-        String imageUrl = "";
-        ImageView imageView;
-
-        LoadImage(String imageUrl, ImageView imageView) {
-            this.imageUrl = imageUrl;
-            this.imageView = imageView;
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... voids) {
-            //get recommendations
-            Bitmap bitmap = null;
-            try {
-                bitmap = BitmapFactory.decodeStream((InputStream) new URL(this.imageUrl).getContent());
-                Log.d("bitmap", bitmap.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return bitmap;
-        }
-
-        @Override
-        protected void onPostExecute(final Bitmap image) {
-            imageView.setImageBitmap(image);
-        }
-
-        @Override
-        protected void onCancelled() {
-        }
-
-
     }
 
 
