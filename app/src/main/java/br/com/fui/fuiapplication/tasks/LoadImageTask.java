@@ -1,5 +1,6 @@
 package br.com.fui.fuiapplication.tasks;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -55,10 +56,12 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(final Bitmap image) {
+        Context context;
         if (imageView != null) {
             imageView.setImageBitmap(image);
         } else if (appBar != null) {
-            Drawable drawableImage = new BitmapDrawable(image);
+            context = appBar.getContext();
+            Drawable drawableImage = new BitmapDrawable(context.getResources(), image);
             if (Build.VERSION.SDK_INT >= 16) {
                 appBar.setBackground(drawableImage);
             } else {

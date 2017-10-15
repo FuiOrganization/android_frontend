@@ -82,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
         getRecommendationsTask = new GetRecommendations();
         getRecommendationsTask.execute((Void) null);
 
-        gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
-
-        gridRecommendations.setAdapter(new ImageAdapter(this, recommendations));
 
         gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
