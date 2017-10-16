@@ -47,6 +47,9 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
                 bitmap = BitmapFactory.decodeStream((InputStream) new URL(this.imageUrl).getContent());
                 //add to memory cache
                 MemoryCache.addBitmapToMemoryCache(this.imageUrl, bitmap);
+                Log.d("cache", "Saving image to cache");
+            }else{
+                Log.d("cache", "Retrieving image from cache");
             }
         } catch (IOException e) {
             e.printStackTrace();
