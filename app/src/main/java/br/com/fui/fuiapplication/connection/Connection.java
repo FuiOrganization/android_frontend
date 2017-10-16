@@ -26,7 +26,7 @@ public class Connection {
     //timeout in milliseconds
     private static final int timeout = 5000;
     private static final String c9IP = "";
-    private static final String localIP = "http://192.168.25.6:3000/";
+    private static final String localIP = "http://192.168.25.54:3000/";
     private static String serverIP = localIP;
     private static String token = "";
     private static boolean validToken = false;

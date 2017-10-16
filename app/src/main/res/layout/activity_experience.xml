@@ -32,13 +32,10 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_experience"
-        android:id="@+id/include" />
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/favorite_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:layout_margin="@dimen/fab_margin"
         app:backgroundTint="@android:color/holo_orange_light"
         app:layout_anchor="@id/app_bar"
@@ -49,7 +46,7 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fui_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:layout_gravity="center"
         android:layout_marginRight="75dp"
         app:backgroundTint="@android:color/holo_blue_dark"
@@ -61,12 +58,15 @@
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/share_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="botaoShareClicado"
+        android:layout_height="35dp"
         android:layout_marginRight="135dp"
         app:backgroundTint="@android:color/holo_red_light"
         app:layout_anchor="@+id/app_bar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_share" />
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/content_experience" />
 
 </android.support.design.widget.CoordinatorLayout>

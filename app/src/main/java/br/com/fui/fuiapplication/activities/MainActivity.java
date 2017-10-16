@@ -2,14 +2,13 @@ package br.com.fui.fuiapplication.activities;
 
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.LruCache;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -61,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //close loginActivity
-        setResult(RESULT_OK);
-
         MemoryCache.start();
 
         ActionBar actionBar = getSupportActionBar();
@@ -78,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         mTextMessage.setVisibility(View.INVISIBLE);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
 
         getRecommendationsTask = new GetRecommendations();
         getRecommendationsTask.execute((Void) null);

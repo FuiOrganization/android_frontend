@@ -3,13 +3,12 @@ package br.com.fui.fuiapplication.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -30,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         //verifies if user is already logged in
         if(AccessToken.getCurrentAccessToken()!= null && !AccessToken.getCurrentAccessToken().isExpired()){
             startActivity(mainIntent);
+            finish();
         }
 
         setContentView(R.layout.activity_login);
@@ -42,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         startActivityForResult(mainIntent, REQUEST_EXIT);
+                        LoginActivity.this.finish();
                     }
 
                     @Override
@@ -61,12 +62,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
-
-        switch(requestCode){
-            case REQUEST_EXIT:
-                finish();
-                break;
-        }
     }
 
 
