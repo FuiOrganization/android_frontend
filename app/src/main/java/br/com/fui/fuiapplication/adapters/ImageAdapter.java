@@ -1,4 +1,4 @@
-package br.com.fui.fuiapplication.models;
+package br.com.fui.fuiapplication.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.models.Experience;
 import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 /**

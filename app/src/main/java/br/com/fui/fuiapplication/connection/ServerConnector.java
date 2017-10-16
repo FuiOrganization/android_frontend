@@ -17,7 +17,7 @@ import java.net.URL;
  * Created by guilherme on 13/10/17.
  */
 
-public class Connection {
+public class ServerConnector {
 
     public static final int AUTHORIZATION_CODE = 201;
     public static final int SERVICE_UNAVAILABLE_CODE = 503;
@@ -42,15 +42,15 @@ public class Connection {
         ResponseMessage response = null;
 
         try {
-            URL url = new URL(Connection.serverIP + action);
+            URL url = new URL(ServerConnector.serverIP + action);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
-            connection.setConnectTimeout(Connection.timeout);
-            connection.setReadTimeout(Connection.timeout);
-            if (Connection.validToken) {
+            connection.setConnectTimeout(ServerConnector.timeout);
+            connection.setReadTimeout(ServerConnector.timeout);
+            if (ServerConnector.validToken) {
                 connection.setRequestProperty("Authorization", token);
             }
             connection.connect();

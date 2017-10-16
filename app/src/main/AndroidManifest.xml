@@ -18,7 +18,7 @@
             android:name=".activities.ExperienceActivity"
             android:label="@string/title_activity_experience"
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.ExperienceAppBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.com.fui.fuiapplication.activities.MainActivity" />

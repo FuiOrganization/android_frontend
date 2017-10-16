@@ -26,8 +26,8 @@ public class ExperienceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_experience);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.app_bar);
 
         Intent i = getIntent();
         experience = (Experience) i.getSerializableExtra("experience");
@@ -66,11 +66,14 @@ public class ExperienceActivity extends AppCompatActivity {
             }
         });
 
+        //enable display home
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //load description
         TextView description = (TextView) findViewById(R.id.experience_description);
         description.setText(experience.getDescription());
 
+        //set support action bar title
         setTitle(experience.getTitle());
 
         //update appbar image

@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,7 +18,7 @@ import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.models.Experience;
-import br.com.fui.fuiapplication.models.ImageAdapter;
+import br.com.fui.fuiapplication.adapters.ImageAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
