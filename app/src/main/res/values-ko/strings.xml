@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fui!</string>
+    <string name="share_experience_checkout_message">이 장소를 확인해 보세요!</string>
+    <string name="share_experience_success_message">링크가 복사되었습니다!</string>
+    <string name="sponsored_label">스폰서</string>
+    <string name="title_activity_experience">액티비티</string>
+    <string name="title_favorites">즐겨찾기</string>
+    <string name="title_history">히스토리</string>
+    <string name="title_home">홈페이지</string>
+</resources>
