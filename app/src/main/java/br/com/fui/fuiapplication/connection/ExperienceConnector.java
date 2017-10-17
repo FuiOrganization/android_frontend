@@ -15,7 +15,7 @@ public class ExperienceConnector {
     public static Experience[] getRecommendations() {
         Experience recommendations[] = {};
 
-        ResponseMessage response = ServerConnector.sendRequest("experiences/get_recommendations", null);
+        ResponseMessage response = ServerConnector.sendRequest("experiences/find_recommendations", null);
         try {
             if (response != null) {
                 JSONArray jsonArray = new JSONArray(response.getBody());
