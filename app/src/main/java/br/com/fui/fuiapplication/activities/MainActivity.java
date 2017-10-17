@@ -1,9 +1,12 @@
 package br.com.fui.fuiapplication.activities;
 
+
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,14 +15,18 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.cache.MemoryCache;
+import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.models.Experience;
-import br.com.fui.fuiapplication.models.ImageAdapter;
+import br.com.fui.fuiapplication.adapters.ImageAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
     private GridView gridRecommendations;
     private Intent experienceIntent;
+    private Experience[] recommendations = {};
+    private GetRecommendations getRecommendationsTask;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -52,6 +59,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        MemoryCache.start();
+
+        ActionBar actionBar = getSupportActionBar();
+        //custom action bar with logo
+        actionBar.setCustomView(R.layout.action_bar);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+
         //intent for experience
         experienceIntent = new Intent(this, ExperienceActivity.class);
 
@@ -60,8 +74,11 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        gridRecommendations= (GridView) findViewById(R.id.grid_recommendations);
-        gridRecommendations.setAdapter(new ImageAdapter(this));
+        gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
+
+        getRecommendationsTask = new GetRecommendations();
+        getRecommendationsTask.execute((Void) null);
+
 
         gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -71,5 +88,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    public class GetRecommendations extends AsyncTask<Void, Void, Experience[]> {
+
+        GetRecommendations() {
+        }
+
+        @Override
+        protected Experience[] doInBackground(Void... voids) {
+            //get recommendations
+            Experience recommendations[] = ExperienceConnector.getRecommendations();
+            return recommendations;
+        }
+
+        @Override
+        protected void onPostExecute(final Experience[] recommendations) {
+            MainActivity.this.recommendations = recommendations;
+            MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, MainActivity.this.recommendations));
+        }
+
+        @Override
+        protected void onCancelled() {
+        }
+
+
+    }
+
+
+
 
 }

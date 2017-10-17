@@ -1,15 +1,13 @@
 package br.com.fui.fuiapplication.activities;
 
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ClipboardManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -17,6 +15,7 @@ import android.widget.TextView;
 
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.models.Experience;
+import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 public class ExperienceActivity extends AppCompatActivity {
 
@@ -27,8 +26,8 @@ public class ExperienceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_experience);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.app_bar);
 
         Intent i = getIntent();
         experience = (Experience) i.getSerializableExtra("experience");
@@ -67,17 +66,18 @@ public class ExperienceActivity extends AppCompatActivity {
             }
         });
 
+        //enable display home
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //load description
         TextView description = (TextView) findViewById(R.id.experience_description);
         description.setText(experience.getDescription());
 
+        //set support action bar title
         setTitle(experience.getTitle());
 
-        if (Build.VERSION.SDK_INT >= 16){
-            appBar.setBackground(ContextCompat.getDrawable(this, experience.getImageId()));
-        }else{
-            appBar.setBackgroundDrawable(ContextCompat.getDrawable(this, experience.getImageId()));
-        }
+        //update appbar image
+        LoadImageTask loadImageTaskTask = new LoadImageTask(experience.getImage(), appBar);
+        loadImageTaskTask.execute((Void) null);
     }
 }
