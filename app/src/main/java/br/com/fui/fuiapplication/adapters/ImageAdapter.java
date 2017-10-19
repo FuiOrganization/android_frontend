@@ -1,25 +1,13 @@
 package br.com.fui.fuiapplication.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.models.Experience;
@@ -58,16 +46,10 @@ public class ImageAdapter extends BaseAdapter {
         ImageView experienceImage;
         TextView experienceTitle;
         TextView sponsorship;
-        
+
         //if convertview isn't created yet
         if (convertView == null) {
-            linearLayout = new LinearLayout(mContext);
-
-            linearLayout.setLayoutParams(
-                    new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    ));
+            linearLayout = parent.findViewById(R.id.experience_box);
 
             //fix padding according to position
 
@@ -90,65 +72,15 @@ public class ImageAdapter extends BaseAdapter {
                 );
             }
 
-            //to shadow be able to work
-            linearLayout.setClipToPadding(false);
+            experienceImage = parent.findViewById(R.id.experience_box_image);
 
-            //for shadowing purpose
-            shadowingLayout = new LinearLayout(mContext);
+            sponsorship = parent.findViewById(R.id.experience_box_sponsorship);
 
-            //shadowing works from sdk 21
-            if (Build.VERSION.SDK_INT >= 21) {
-                shadowingLayout.setElevation(5);
-                shadowingLayout.setBackgroundColor(Color.parseColor("white"));
-            }
-
-            shadowingLayout.setOrientation(LinearLayout.VERTICAL);
-            shadowingLayout.setGravity(Gravity.CENTER);
-            shadowingLayout.setLayoutParams(
-                    new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    ));
-
-            relativeLayout = new RelativeLayout(mContext);
-            relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(320, 320));
-            RelativeLayout.LayoutParams relativeLayoutParams;
-
-            // if it's not recycled, initialize some attributes
-            experienceImage = new ImageView(mContext);
-            experienceImage.setLayoutParams(new GridView.LayoutParams(320, 320));
-            experienceImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            //left, top, right, bottom
-            experienceImage.setPadding(0, 0, 0, 0);
-
-            //add to relativelayout
-            relativeLayout.addView(experienceImage);
-
-            relativeLayoutParams = new RelativeLayout.LayoutParams
-                    (RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            relativeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-
-            //create sponsorship label
-            sponsorship = new TextView(mContext);
-            sponsorship.setBackgroundColor(Color.parseColor("#FFC000"));
-            sponsorship.setWidth(150);
-            sponsorship.setHeight(60);
-            sponsorship.setTextColor(Color.parseColor("#ffffff"));
-            sponsorship.setGravity(Gravity.CENTER);
-            sponsorship.setLayoutParams(relativeLayoutParams);
             if (!experiences[position].isSponsored()) {
                 sponsorship.setVisibility(View.INVISIBLE);
             }
-            relativeLayout.addView(sponsorship);
 
-            shadowingLayout.addView(relativeLayout);
-
-            //experience name
-            experienceTitle = new TextView(mContext);
-            experienceTitle.setGravity(Gravity.CENTER);
-            experienceTitle.setPadding(0, 10, 0, 10);
-            shadowingLayout.addView(experienceTitle);
-            linearLayout.addView(shadowingLayout);
+            experienceTitle = parent.findViewById(R.id.experience_box_title);
 
         } else {
             //get data
@@ -163,7 +95,7 @@ public class ImageAdapter extends BaseAdapter {
             }
 
             //if it's the same source
-            if(experienceTitle.getText().equals(experiences[position].getTitle())){
+            if (experienceTitle.getText().equals(experiences[position].getTitle())) {
                 return linearLayout;
             }
         }
