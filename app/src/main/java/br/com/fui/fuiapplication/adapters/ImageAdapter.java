@@ -58,6 +58,7 @@ public class ImageAdapter extends BaseAdapter {
         ImageView experienceImage;
         TextView experienceTitle;
         TextView sponsorship;
+        
         //if convertview isn't created yet
         if (convertView == null) {
             linearLayout = new LinearLayout(mContext);
@@ -159,6 +160,11 @@ public class ImageAdapter extends BaseAdapter {
             sponsorship = (TextView) relativeLayout.getChildAt(1);
             if (!experiences[position].isSponsored()) {
                 sponsorship.setVisibility(View.INVISIBLE);
+            }
+
+            //if it's the same source
+            if(experienceTitle.getText().equals(experiences[position].getTitle())){
+                return linearLayout;
             }
         }
 

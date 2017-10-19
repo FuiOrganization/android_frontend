@@ -6,8 +6,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
+import br.com.fui.fuiapplication.data.Data;
 import br.com.fui.fuiapplication.models.Experience;
 import br.com.fui.fuiapplication.adapters.ImageAdapter;
 
@@ -25,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
     private GridView gridRecommendations;
     private Intent experienceIntent;
-    private Experience[] recommendations = {};
     private GetRecommendations getRecommendationsTask;
+    private SwipeRefreshLayout experienceSwipeRefresh;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -55,38 +58,75 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void onStart(){
+        super.onStart();
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        MemoryCache.start();
+        if(savedInstanceState == null) {
+            Log.d("main_activity", "Creating main activity");
+            setContentView(R.layout.activity_main);
 
-        ActionBar actionBar = getSupportActionBar();
-        //custom action bar with logo
-        actionBar.setCustomView(R.layout.action_bar);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            MemoryCache.start();
 
-        //intent for experience
-        experienceIntent = new Intent(this, ExperienceActivity.class);
+            ActionBar actionBar = getSupportActionBar();
+            //custom action bar with logo
+            actionBar.setCustomView(R.layout.action_bar);
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
-        mTextMessage.setVisibility(View.INVISIBLE);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+            //intent for experience
+            experienceIntent = new Intent(this, ExperienceActivity.class);
 
-        gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
+            mTextMessage = (TextView) findViewById(R.id.message);
+            mTextMessage.setVisibility(View.INVISIBLE);
+            BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+            navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+            gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
+
+            getRecommendationsTask = new GetRecommendations();
+            getRecommendationsTask.execute((Void) null);
+
+
+            gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    experienceIntent.putExtra("experience", (Experience) gridRecommendations.getAdapter().getItem(position));
+                    startActivity(experienceIntent);
+                }
+            });
+
+            experienceSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.experience_swipe_refresh);
+
+            //on swipe to refresh
+            experienceSwipeRefresh.setOnRefreshListener(
+                    new SwipeRefreshLayout.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            updateExperiences();
+                        }
+                    }
+            );
+
+        }
+    }
+
+    /*
+     * On swipe action, call this function
+     * it must reload the experiences then cancel the refresh animation
+     */
+    private void updateExperiences(){
+        //nullify current experiences
+        Data.recommendations = null;
+        //execute new task
         getRecommendationsTask = new GetRecommendations();
         getRecommendationsTask.execute((Void) null);
-
-
-        gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                experienceIntent.putExtra("experience", (Experience) gridRecommendations.getAdapter().getItem(position));
-                startActivity(experienceIntent);
-            }
-        });
+        //cancel animation
+        experienceSwipeRefresh.setRefreshing(false);
     }
 
     public class GetRecommendations extends AsyncTask<Void, Void, Experience[]> {
@@ -96,25 +136,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Experience[] doInBackground(Void... voids) {
-            //get recommendations
-            Experience recommendations[] = ExperienceConnector.getRecommendations();
-            return recommendations;
+            //get recommendations if current data is null
+            if(Data.recommendations==null){
+                Data.recommendations = ExperienceConnector.getRecommendations();
+                return Data.recommendations;
+            }
+            return Data.recommendations;
         }
 
         @Override
         protected void onPostExecute(final Experience[] recommendations) {
-            MainActivity.this.recommendations = recommendations;
-            MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, MainActivity.this.recommendations));
+            MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, Data.recommendations));
         }
 
         @Override
         protected void onCancelled() {
         }
-
-
     }
-
-
-
-
 }
