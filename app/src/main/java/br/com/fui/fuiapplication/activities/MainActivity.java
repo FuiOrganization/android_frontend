@@ -40,16 +40,19 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     mTextMessage.setVisibility(View.INVISIBLE);
                     gridRecommendations.setVisibility(View.VISIBLE);
+                    experienceSwipeRefresh.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.navigation_favorites:
+                    mTextMessage.setText(R.string.title_favorites);
                     mTextMessage.setVisibility(View.VISIBLE);
                     gridRecommendations.setVisibility(View.INVISIBLE);
-                    mTextMessage.setText(R.string.title_favorites);
+                    experienceSwipeRefresh.setVisibility(View.INVISIBLE);
                     return true;
                 case R.id.navigation_history:
+                    mTextMessage.setText(R.string.title_history);
                     mTextMessage.setVisibility(View.VISIBLE);
                     gridRecommendations.setVisibility(View.INVISIBLE);
-                    mTextMessage.setText(R.string.title_history);
+                    experienceSwipeRefresh.setVisibility(View.INVISIBLE);
                     return true;
             }
             return false;
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
 
     }
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
 
@@ -102,6 +105,11 @@ public class MainActivity extends AppCompatActivity {
 
             experienceSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.experience_swipe_refresh);
 
+            //if recommendations are not loaded yet, start animation
+            if (Data.recommendations == null || Data.recommendations.length == 0) {
+                experienceSwipeRefresh.setRefreshing(true);
+            }
+
             //on swipe to refresh
             experienceSwipeRefresh.setOnRefreshListener(
                     new SwipeRefreshLayout.OnRefreshListener() {
@@ -117,16 +125,16 @@ public class MainActivity extends AppCompatActivity {
 
     /*
      * On swipe action, call this function
-     * it must reload the experiences then cancel the refresh animation
+     * it must reload the experiences, on grid recommendations task it must cancel the animation
      */
-    private void updateExperiences(){
+    private void updateExperiences() {
+        //hide text message
+        mTextMessage.setVisibility(View.INVISIBLE);
         //nullify current experiences
         Data.recommendations = null;
         //execute new task
         getRecommendationsTask = new GetRecommendations();
         getRecommendationsTask.execute((Void) null);
-        //cancel animation
-        experienceSwipeRefresh.setRefreshing(false);
     }
 
     public class GetRecommendations extends AsyncTask<Void, Void, Experience[]> {
@@ -137,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Experience[] doInBackground(Void... voids) {
             //get recommendations if current data is null
-            if(Data.recommendations==null){
+            if (Data.recommendations == null) {
                 Data.recommendations = ExperienceConnector.getRecommendations();
                 return Data.recommendations;
             }
@@ -146,7 +154,20 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final Experience[] recommendations) {
+            //if it couldn't retrieve any data
+            if (Data.recommendations == null || Data.recommendations.length == 0) {
+                mTextMessage.setText(R.string.message_error_retrieve_data);
+                mTextMessage.setVisibility(View.VISIBLE);
+                MainActivity.this.gridRecommendations.setVisibility(View.INVISIBLE);
+            } else {
+                mTextMessage.setVisibility(View.INVISIBLE);
+                MainActivity.this.gridRecommendations.setVisibility(View.VISIBLE);
+            }
+
             MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, Data.recommendations));
+
+            //cancel animation
+            experienceSwipeRefresh.setRefreshing(false);
         }
 
         @Override
