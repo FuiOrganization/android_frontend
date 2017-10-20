@@ -20,8 +20,9 @@ import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
-import br.com.fui.fuiapplication.adapters.ImageAdapter;
+import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,7 +72,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
 
+            //start memory cache
             MemoryCache.start();
+
+            //start resolution helper
+            ResolutionHelper.start(this);
 
             ActionBar actionBar = getSupportActionBar();
             //custom action bar with logo
@@ -146,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final Experience[] recommendations) {
-            MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, Data.recommendations));
+            MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
         }
 
         @Override

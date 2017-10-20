@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
 import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
@@ -18,11 +19,11 @@ import br.com.fui.fuiapplication.tasks.LoadImageTask;
  * Created by guilherme on 19/09/17.
  */
 
-public class ImageAdapter extends BaseAdapter {
+public class ExperienceBoxImageAdapter extends BaseAdapter {
     private Context mContext;
     private Experience experiences[] = {};
 
-    public ImageAdapter(Context c, Experience recommendations[]) {
+    public ExperienceBoxImageAdapter(Context c, Experience recommendations[]) {
         mContext = c;
         this.experiences = recommendations;
     }
@@ -53,27 +54,38 @@ public class ImageAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.experience_box, null);
             linearLayout = convertView.findViewById(R.id.experience_box);
 
+            //Adjust size for multiple screens
+            int leftOnesTop = ResolutionHelper.getAdjustedPixels(25, ResolutionHelper.WIDTH);
+            int rightOnesTop = ResolutionHelper.getAdjustedPixels(15, ResolutionHelper.WIDTH);
+            int imageSize = ResolutionHelper.getAdjustedPixels(320, ResolutionHelper.WIDTH);
+            int singleHeight = ResolutionHelper.getAdjustedPixels(10, ResolutionHelper.HEIGHT);
+            int doubleHeight = ResolutionHelper.getAdjustedPixels(20, ResolutionHelper.HEIGHT);
+
             //fix padding according to position
             //left ones
             if (position % 2 == 0) {
                 //left, top, right, bottom
-                linearLayout.setPadding(25, 10, 0, 10);
+                linearLayout.setPadding(leftOnesTop, singleHeight, 0, singleHeight);
             } else {
                 //right ones
-                linearLayout.setPadding(15, 10, 0, 10);
+                linearLayout.setPadding(rightOnesTop, singleHeight, 0, singleHeight);
             }
 
             //increase top padding for two first ones
             if (position <= 1) {
                 linearLayout.setPadding(
                         linearLayout.getPaddingLeft(),
-                        linearLayout.getPaddingTop() + 20,
+                        linearLayout.getPaddingTop() + doubleHeight,
                         linearLayout.getPaddingRight(),
                         linearLayout.getPaddingBottom()
                 );
             }
 
+            relativeLayout = convertView.findViewById(R.id.experience_box_relative_layout);
+            relativeLayout.setLayoutParams(new LinearLayout.LayoutParams(imageSize, imageSize));
+
             experienceImage = convertView.findViewById(R.id.experience_box_image);
+            experienceImage.setLayoutParams(new RelativeLayout.LayoutParams(imageSize, imageSize));
 
             sponsorship = convertView.findViewById(R.id.experience_box_sponsorship);
 

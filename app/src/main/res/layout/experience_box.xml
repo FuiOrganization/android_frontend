@@ -17,6 +17,7 @@
         android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/experience_box_relative_layout"
             android:layout_width="160dp"
             android:layout_height="160dp">
 
