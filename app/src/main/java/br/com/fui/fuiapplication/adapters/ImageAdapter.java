@@ -1,6 +1,7 @@
 package br.com.fui.fuiapplication.adapters;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -47,40 +48,40 @@ public class ImageAdapter extends BaseAdapter {
         TextView experienceTitle;
         TextView sponsorship;
 
-        //if convertview isn't created yet
+        //if convertView isn't created yet
         if (convertView == null) {
-            linearLayout = parent.findViewById(R.id.experience_box);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.experience_box, null);
+            linearLayout = convertView.findViewById(R.id.experience_box);
 
             //fix padding according to position
-
+            //left ones
             if (position % 2 == 0) {
                 //left, top, right, bottom
-                linearLayout.setPadding(10, 10, 5, 10);
+                linearLayout.setPadding(25, 10, 0, 10);
             } else {
-                //left, top, right, bottom
-                linearLayout.setPadding(5, 10, 10, 10);
+                //right ones
+                linearLayout.setPadding(15, 10, 0, 10);
             }
 
             //increase top padding for two first ones
-
             if (position <= 1) {
                 linearLayout.setPadding(
                         linearLayout.getPaddingLeft(),
-                        linearLayout.getPaddingTop() + 10,
+                        linearLayout.getPaddingTop() + 20,
                         linearLayout.getPaddingRight(),
                         linearLayout.getPaddingBottom()
                 );
             }
 
-            experienceImage = parent.findViewById(R.id.experience_box_image);
+            experienceImage = convertView.findViewById(R.id.experience_box_image);
 
-            sponsorship = parent.findViewById(R.id.experience_box_sponsorship);
+            sponsorship = convertView.findViewById(R.id.experience_box_sponsorship);
 
             if (!experiences[position].isSponsored()) {
                 sponsorship.setVisibility(View.INVISIBLE);
             }
 
-            experienceTitle = parent.findViewById(R.id.experience_box_title);
+            experienceTitle = convertView.findViewById(R.id.experience_box_title);
 
         } else {
             //get data
