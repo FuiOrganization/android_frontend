@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    android:id="@+id/main_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -24,18 +24,26 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:text="@string/title_home" />
 
-        <GridView
-            android:id="@+id/grid_recommendations"
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/experience_swipe_refresh"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnWidth="90dp"
-            android:numColumns="2"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="0dp"
-            android:stretchMode="columnWidth"
+            android:layout_height="match_parent">
 
-            android:gravity="center" >
-        </GridView>
+            <GridView
+                android:id="@+id/grid_recommendations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnWidth="90dp"
+                android:numColumns="2"
+                android:verticalSpacing="10dp"
+                android:horizontalSpacing="0dp"
+                android:stretchMode="columnWidth"
+
+                android:gravity="center" >
+            </GridView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </FrameLayout>
 

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/experience_box"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    tools:context="br.com.fui.fuiapplication.activities.MainActivity">
+
+    <LinearLayout
+        android:id="@+id/experience_box_shadow"
+        android:elevation="3dp"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/experience_box_relative_layout"
+            android:layout_width="160dp"
+            android:layout_height="160dp">
+
+            <ImageView
+                android:id="@+id/experience_box_image"
+                android:scaleType="centerCrop"
+                android:layout_width="160dp"
+                android:layout_height="160dp"/>
+
+            <TextView
+                android:id="@+id/experience_box_sponsorship"
+                android:background="#FFC000"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:width="150dp"
+                android:height="25dp"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+        
+        <TextView
+            android:id="@+id/experience_box_title"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        
+    </LinearLayout>
+
+</LinearLayout>

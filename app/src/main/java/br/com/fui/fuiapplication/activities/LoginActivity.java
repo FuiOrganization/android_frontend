@@ -20,14 +20,21 @@ public class LoginActivity extends AppCompatActivity {
     CallbackManager callbackManager;
     Intent mainIntent;
     private final int REQUEST_EXIT = 0;
+    private final boolean DEBUG_MODE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainIntent = new Intent(this, MainActivity.class);
 
+        if (DEBUG_MODE) {
+            //skip login
+            startActivity(mainIntent);
+            finish();
+        }
+
         //verifies if user is already logged in
-        if(AccessToken.getCurrentAccessToken()!= null && !AccessToken.getCurrentAccessToken().isExpired()){
+        if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
             startActivity(mainIntent);
             finish();
         }
