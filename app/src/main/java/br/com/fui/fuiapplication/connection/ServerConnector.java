@@ -1,7 +1,10 @@
 package br.com.fui.fuiapplication.connection;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -31,6 +34,10 @@ public class ServerConnector {
     private static String serverIP = herokuIP;
     private static String token = "";
     private static boolean validToken = false;
+    private static String facebook_identifier = "";
+    private static Context appContext;
+    private static SharedPreferences settings;
+    public static final String PREFS_NAME = "Fui";
 
 
     /**
@@ -112,6 +119,87 @@ public class ServerConnector {
         }
 
         return response;
+    }
+
+    /**
+     * Sends an authorization request to the server.
+     * @param facebook_identifier   facebookd id
+     * @param user_token    user's facebook token
+     * @param app_token     facebook app token
+     * @return the request return code
+     */
+    public static int login(String facebook_identifier, String user_token, String app_token){
+        try{
+            JSONObject holder = new JSONObject();
+            JSONObject user = new JSONObject();
+            user.put("facebook_identifier", facebook_identifier);
+            user.put("access_token", user_token);
+            user.put("app_access_token", app_token);
+            holder.put("auth", user);
+
+            ResponseMessage response = ServerConnector.sendRequest("facebook_user_token", holder);
+
+            if (response != null) {
+                if(response.getCode() == AUTHORIZATION_CODE){
+                    JSONObject responseBody = new JSONObject(response.getBody());
+                    if(responseBody.get("jwt") != null){
+                        ServerConnector.updateData(facebook_identifier, responseBody.get("jwt").toString());
+                        Log.d("request", "token: " + ServerConnector.token);
+                    }
+                }
+                return response.getCode();
+            } else {
+                return NO_CONNECTION_CODE;
+            }
+
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        return NO_CONNECTION_CODE;
+    }
+
+
+    /**
+     * Saves account's information on Shared Preferences.
+     * @param facebook_identifier   facebook id
+     * @param jwt       user's json web token
+     */
+    public static void updateData(String facebook_identifier,  String jwt){
+        ServerConnector.token = jwt;
+        ServerConnector.validToken = true;
+        ServerConnector.facebook_identifier = facebook_identifier;
+        SharedPreferences.Editor editor = ServerConnector.settings.edit();
+        editor.putString("facebook_identifier", facebook_identifier);
+        editor.putString("token", jwt);
+        editor.commit();
+    }
+
+    /**
+     * Accesses Shared Preferences data and updates Connection's attributes.
+     * Returns whether there's an account saved or not
+     * @return  whether there's a saved account or not
+     */
+    public static boolean retrieveData(){
+        if(ServerConnector.settings.contains("facebook_identifier")){
+            ServerConnector.facebook_identifier = ServerConnector.settings.getString("facebook_identifier", "");
+            ServerConnector.token = ServerConnector.settings.getString("token", "");
+            validToken = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  Verifies if application has a stored account by retrieving saved information
+     *  such as user's email, password and token.
+     * @param   context the application context
+     * @return          whether the application has a stored account or not
+     */
+    public static boolean hasSavedAccount(Context context){
+        ServerConnector.appContext = context;
+        ServerConnector.settings = appContext.getSharedPreferences(PREFS_NAME, 0);
+        return retrieveData();
     }
 
 
