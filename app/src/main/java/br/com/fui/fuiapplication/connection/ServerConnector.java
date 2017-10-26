@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.facebook.AccessToken;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,6 +18,8 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 
+import br.com.fui.fuiapplication.data.Application;
+
 /**
  * Created by guilherme on 13/10/17.
  */
@@ -24,21 +28,32 @@ public class ServerConnector {
 
     public static final int AUTHORIZATION_CODE = 201;
     public static final int SERVICE_UNAVAILABLE_CODE = 503;
-    public static final int UNAUTHORIZED_CODE = 404;
+    public static final int UNAUTHORIZED_CODE = 401;
     public static final int NO_CONNECTION_CODE = -1;
     //timeout in milliseconds
     private static final int timeout = 5000;
     private static final String c9IP = "";
     private static final String localIP = "http://192.168.25.6:3000/";
     private static final String herokuIP = "https://fuiserver.herokuapp.com/";
-    private static String serverIP = herokuIP;
+    private static final String developmentIP = localIP;
+    private static final String productionIP = herokuIP;
     private static String token = "";
     private static boolean validToken = false;
     private static String facebook_identifier = "";
     private static Context appContext;
     private static SharedPreferences settings;
     public static final String PREFS_NAME = "Fui";
+    //limit multiple request attempts
+    public static final int maxAttempts = 3;
 
+
+    public static String getServerIP(){
+        if(Application.PRODUCTION){
+            return productionIP;
+        }else{
+            return developmentIP;
+        }
+    }
 
     /**
      * Sends a request to the server
@@ -46,11 +61,13 @@ public class ServerConnector {
      * @param info      json data
      * @return the ResponseMessage object for the request. Returns null if connection is unsuccessful.
      */
-    public static ResponseMessage sendRequest(String action, JSONObject info){
+    public static ResponseMessage sendRequest(String action, JSONObject info, int attempt){
+        //new attempt
+        attempt++;
         ResponseMessage response = null;
 
         try {
-            URL url = new URL(ServerConnector.serverIP + action);
+            URL url = new URL(ServerConnector.getServerIP() + action);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
@@ -84,16 +101,16 @@ public class ServerConnector {
             } else {
                 br = new BufferedReader(new InputStreamReader((connection.getErrorStream())));
 
-                //unauthorized request and user was previously logged in
-                if (connection.getResponseCode() == UNAUTHORIZED_CODE && validToken) {
+                //unauthorized request, user was previously logged in and max attempts not reached out yet
+                if (connection.getResponseCode() == UNAUTHORIZED_CODE && validToken && attempt < maxAttempts) {
                     validToken = false;
                     //tries to refresh token
                     Log.d("request", "Refreshing Token");
-                    //int code = login(email, password);
-                    /*if (code == AUTHORIZATION_CODE) {
+                    int code = facebookLogin(attempt);
+                    if (code == AUTHORIZATION_CODE) {
                         // try again
-                        return sendRequest(action, info);
-                    }*/
+                        return sendRequest(action, info, attempt);
+                    }
                 }
 
             }
@@ -123,21 +140,26 @@ public class ServerConnector {
 
     /**
      * Sends an authorization request to the server.
-     * @param facebook_identifier   facebookd id
-     * @param user_token    user's facebook token
-     * @param app_token     facebook app token
      * @return the request return code
      */
-    public static int login(String facebook_identifier, String user_token, String app_token){
+    public static int facebookLogin(int attempts){
+        String user_token, facebook_identifier;
+
+        if(AccessToken.getCurrentAccessToken()!=null){
+            user_token = AccessToken.getCurrentAccessToken().getToken();
+            facebook_identifier = AccessToken.getCurrentAccessToken().getUserId();
+        }else{
+            return NO_CONNECTION_CODE;
+        }
+
         try{
             JSONObject holder = new JSONObject();
             JSONObject user = new JSONObject();
             user.put("facebook_identifier", facebook_identifier);
             user.put("access_token", user_token);
-            user.put("app_access_token", app_token);
             holder.put("auth", user);
 
-            ResponseMessage response = ServerConnector.sendRequest("facebook_user_token", holder);
+            ResponseMessage response = ServerConnector.sendRequest("facebook_user_token", holder, attempts);
 
             if (response != null) {
                 if(response.getCode() == AUTHORIZATION_CODE){
@@ -192,7 +214,7 @@ public class ServerConnector {
 
     /**
      *  Verifies if application has a stored account by retrieving saved information
-     *  such as user's email, password and token.
+     *  such as user's facebook id and fui token
      * @param   context the application context
      * @return          whether the application has a stored account or not
      */
