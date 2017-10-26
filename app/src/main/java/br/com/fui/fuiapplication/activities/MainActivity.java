@@ -17,11 +17,12 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
 import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
-import br.com.fui.fuiapplication.adapters.ImageAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,7 +75,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
 
+            //start memory cache
             MemoryCache.start();
+
+            //start resolution helper
+            ResolutionHelper.start(this);
 
             ActionBar actionBar = getSupportActionBar();
             //custom action bar with logo
@@ -154,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final Experience[] recommendations) {
+
             //if it couldn't retrieve any data
             if (Data.recommendations == null || Data.recommendations.length == 0) {
                 mTextMessage.setText(R.string.message_error_retrieve_data);
@@ -164,10 +170,11 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.gridRecommendations.setVisibility(View.VISIBLE);
             }
 
-            MainActivity.this.gridRecommendations.setAdapter(new ImageAdapter(MainActivity.this, Data.recommendations));
+            MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
 
             //cancel animation
             experienceSwipeRefresh.setRefreshing(false);
+
         }
 
         @Override
