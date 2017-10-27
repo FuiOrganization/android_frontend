@@ -6,5 +6,6 @@ package br.com.fui.fuiapplication.data;
 
 public class Application {
     public static boolean DEBUG_MODE = false;
-    public static boolean PRODUCTION = false;
+    //WARNING: production value must be true at the master branch
+    public static boolean PRODUCTION = true;
 }
