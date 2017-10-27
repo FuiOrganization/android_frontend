@@ -30,11 +30,19 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mainIntent = new Intent(this, MainActivity.class);
 
-        //TODO: it's not possible to jump log in anymore, must authenticate to server first
+        //TODO debug mode is not working properly after fui authentication
+        //skip facebook login and fake fui authentication
         if (Application.DEBUG_MODE) {
-            //skip login
-            startActivity(mainIntent);
-            finish();
+            //set test access token
+            AccessToken fakeAccessToken = new AccessToken(
+                    Application.TEST_USER_ACCESS_TOKEN, getResources().getString(R.string.facebook_app_id),
+                    Application.TEST_USER_ID, null, null,
+                    null, null, null
+            );
+            AccessToken.setCurrentAccessToken(fakeAccessToken);
+            //execute login task
+            logInTask = new LogInTask();
+            logInTask.execute((Void) null);
         }
 
         //verifies if user is already logged in
