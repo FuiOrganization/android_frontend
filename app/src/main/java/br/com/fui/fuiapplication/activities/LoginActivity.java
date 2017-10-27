@@ -1,6 +1,7 @@
 package br.com.fui.fuiapplication.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,28 +16,40 @@ import com.facebook.login.widget.LoginButton;
 import java.util.Arrays;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.connection.ServerConnector;
+import br.com.fui.fuiapplication.data.Application;
 
 public class LoginActivity extends AppCompatActivity {
     CallbackManager callbackManager;
     Intent mainIntent;
     private final int REQUEST_EXIT = 0;
-    private final boolean DEBUG_MODE = false;
+    private LogInTask logInTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainIntent = new Intent(this, MainActivity.class);
 
-        if (DEBUG_MODE) {
-            //skip login
-            startActivity(mainIntent);
-            finish();
+        //TODO debug mode is not working properly after fui authentication
+        //skip facebook login and fake fui authentication
+        if (Application.DEBUG_MODE) {
+            //set test access token
+            AccessToken fakeAccessToken = new AccessToken(
+                    Application.TEST_USER_ACCESS_TOKEN, getResources().getString(R.string.facebook_app_id),
+                    Application.TEST_USER_ID, null, null,
+                    null, null, null
+            );
+            AccessToken.setCurrentAccessToken(fakeAccessToken);
+            //execute login task
+            logInTask = new LogInTask();
+            logInTask.execute((Void) null);
         }
 
         //verifies if user is already logged in
         if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
-            startActivity(mainIntent);
-            finish();
+            //execute login task
+            logInTask = new LogInTask();
+            logInTask.execute((Void) null);
         }
 
         setContentView(R.layout.activity_login);
@@ -48,8 +61,9 @@ public class LoginActivity extends AppCompatActivity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                        startActivityForResult(mainIntent, REQUEST_EXIT);
-                        LoginActivity.this.finish();
+                        //login to fui server
+                        logInTask = new LogInTask();
+                        logInTask.execute((Void) null);
                     }
 
                     @Override
@@ -69,6 +83,29 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //AsyncTask to deal with login function
+    private class LogInTask extends AsyncTask<Void, Void, Integer>{
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            //verify if has saved account
+            if(ServerConnector.hasSavedAccount(LoginActivity.this)){
+                return ServerConnector.AUTHORIZATION_CODE;
+            }
+            //try to login to server
+            return ServerConnector.facebookLogin(0);
+        }
+
+        @Override
+        protected void onPostExecute(final Integer code) {
+            //if successfully, go to main activity
+            if(code == ServerConnector.AUTHORIZATION_CODE){
+                startActivity(mainIntent);
+                finish();
+            }
+        }
     }
 
 

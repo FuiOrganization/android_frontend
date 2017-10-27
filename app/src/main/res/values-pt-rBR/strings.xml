@@ -6,4 +6,5 @@
     <string name="share_experience_success_message">Link de compartilhamento copiado com sucesso!</string>
     <string name="share_experience_checkout_message">Confira esse Lugar! Fui!</string>
     <string name="sponsored_label">Patrocinado</string>
+    <string name="message_error_retrieve_data">Não foi possível carregar os dados no momento, tente novamente mais tarde.</string>
 </resources>

@@ -6,6 +6,7 @@
     <string name="title_favorites">Favorites</string>
     <string name="title_history">History</string>
     <string name="title_activity_experience">ExperienceActivity</string>
+    <string name="message_error_retrieve_data">It was not possible to retrieve data, try again later.</string>
     <string name="share_experience_success_message">Share link successfully copied!</string>
     <string name="share_experience_checkout_message">Check out this place!</string>
     <string name="sponsored_label">Sponsored</string>
