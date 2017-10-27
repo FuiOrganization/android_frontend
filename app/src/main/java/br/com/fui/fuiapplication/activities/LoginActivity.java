@@ -30,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mainIntent = new Intent(this, MainActivity.class);
 
+        //TODO: it's not possible to jump log in anymore, must authenticate to server first
         if (Application.DEBUG_MODE) {
             //skip login
             startActivity(mainIntent);
