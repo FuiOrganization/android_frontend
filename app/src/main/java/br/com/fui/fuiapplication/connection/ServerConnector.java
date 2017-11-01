@@ -26,14 +26,16 @@ import br.com.fui.fuiapplication.data.Application;
 
 public class ServerConnector {
 
+    public static final int OK_CODE = 200;
     public static final int AUTHORIZATION_CODE = 201;
-    public static final int SERVICE_UNAVAILABLE_CODE = 503;
     public static final int UNAUTHORIZED_CODE = 401;
+    public static final int SERVER_ERROR_CODE = 500;
+    public static final int SERVICE_UNAVAILABLE_CODE = 503;
     public static final int NO_CONNECTION_CODE = -1;
     //timeout in milliseconds
     private static final int timeout = 5000;
     private static final String c9IP = "";
-    private static final String localIP = "http://192.168.25.6:3000/";
+    private static final String localIP = "http://192.168.25.87:3000/";
     private static final String herokuIP = "https://fuiserver.herokuapp.com/";
     private static final String developmentIP = localIP;
     private static final String productionIP = herokuIP;

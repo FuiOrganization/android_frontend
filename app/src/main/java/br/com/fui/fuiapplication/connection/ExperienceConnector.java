@@ -12,6 +12,26 @@ import br.com.fui.fuiapplication.models.Experience;
 
 public class ExperienceConnector {
 
+    public static boolean checkin(int experience_id){
+        JSONObject holder = new JSONObject();
+        try {
+            holder.put("experience_id", experience_id);
+            ResponseMessage response = ServerConnector.sendRequest("checkin/checkin", holder, 0);
+            if(response != null){
+                if(response.getCode() == ServerConnector.OK_CODE){
+                    return true;
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Sends a request to server for four recommendations
+     * @return array of recommendations
+     */
     public static Experience[] getRecommendations() {
         Experience recommendations[] = {};
 
@@ -20,16 +40,18 @@ public class ExperienceConnector {
             if (response != null) {
                 JSONArray jsonArray = new JSONArray(response.getBody());
                 recommendations = new Experience[jsonArray.length()];
-                for (int i = 0; i < jsonArray.length(); i++) {
 
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject object = jsonArray.getJSONObject(i);
                     Experience e = new Experience(
+                            object.getInt("id"),
                             object.getString("name"),
                             object.getString("description"), object.getString("image_url"),
                             object.getBoolean("sponsored")
                     );
                     recommendations[i] = e;
                 }
+
             }
         } catch (JSONException e) {
             e.printStackTrace();

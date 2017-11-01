@@ -2,11 +2,16 @@
     <string name="facebook_app_id">2052368771707314</string>
     <string name="fb_login_protocol_scheme">fb2052368771707314</string>
     <string name="app_name">Fui!</string>
+    <string name="confirm">Confirm</string>
     <string name="title_home">Home</string>
     <string name="title_favorites">Favorites</string>
     <string name="title_history">History</string>
-    <string name="title_activity_experience">ExperienceActivity</string>
+    <string name="title_activity_experience">Experience</string>
     <string name="message_error_retrieve_data">It was not possible to retrieve data, try again later.</string>
+    <string name="fui_success_message">You\'ve been sucessfully checked in!</string>
+    <string name="fui_failure_message">It was not possible to confirm your check in for some reason.</string>
+    <string name="fui_confirmation_title">Confirmation</string>
+    <string name="fui_confirmation_message">Are you sure that you want to Check in at %1$s?</string>
     <string name="share_experience_success_message">Share link successfully copied!</string>
     <string name="share_experience_checkout_message">Check out this place!</string>
     <string name="sponsored_label">Sponsored</string>
