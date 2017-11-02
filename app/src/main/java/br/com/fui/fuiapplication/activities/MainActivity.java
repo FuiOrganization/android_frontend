@@ -13,8 +13,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
@@ -27,7 +30,7 @@ import br.com.fui.fuiapplication.models.Experience;
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
-    private GridView gridRecommendations;
+    public static  GridView gridRecommendations;
     private Intent experienceIntent;
     private GetRecommendations getRecommendationsTask;
     private SwipeRefreshLayout experienceSwipeRefresh;
@@ -111,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             experienceSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.experience_swipe_refresh);
 
             //if recommendations are not loaded yet, start animation
-            if (Data.recommendations == null || Data.recommendations.length == 0) {
+            if (Data.recommendations == null || Data.recommendations.size() == 0) {
                 experienceSwipeRefresh.setRefreshing(true);
             }
 
@@ -142,13 +145,13 @@ public class MainActivity extends AppCompatActivity {
         getRecommendationsTask.execute((Void) null);
     }
 
-    public class GetRecommendations extends AsyncTask<Void, Void, Experience[]> {
+    public class GetRecommendations extends AsyncTask<Void, Void, ArrayList<Experience>> {
 
         GetRecommendations() {
         }
 
         @Override
-        protected Experience[] doInBackground(Void... voids) {
+        protected ArrayList<Experience> doInBackground(Void... voids) {
             //get recommendations if current data is null
             if (Data.recommendations == null) {
                 Data.recommendations = ExperienceConnector.getRecommendations();
@@ -158,10 +161,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(final Experience[] recommendations) {
+        protected void onPostExecute(final ArrayList<Experience> recommendations) {
 
             //if it couldn't retrieve any data
-            if (Data.recommendations == null || Data.recommendations.length == 0) {
+            if (Data.recommendations == null || Data.recommendations.size() == 0) {
                 mTextMessage.setText(R.string.message_error_retrieve_data);
                 mTextMessage.setVisibility(View.VISIBLE);
                 MainActivity.this.gridRecommendations.setVisibility(View.INVISIBLE);

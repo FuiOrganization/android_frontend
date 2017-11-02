@@ -1,5 +1,7 @@
 package br.com.fui.fuiapplication.data;
 
+import java.util.ArrayList;
+
 import br.com.fui.fuiapplication.models.Experience;
 
 /**
@@ -7,5 +9,5 @@ import br.com.fui.fuiapplication.models.Experience;
  */
 
 public class Data {
-    public static Experience[] recommendations = null;
+    public static ArrayList<Experience> recommendations = null;
 }
