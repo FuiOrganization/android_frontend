@@ -10,14 +10,14 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -88,11 +88,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //start resolution helper
             ResolutionHelper.start(this);
 
-            /*ActionBar actionBar = getSupportActionBar();
-            //custom action bar with logo
-            actionBar.setCustomView(R.layout.action_bar);
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            */
+            //Add toolbar
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            //Exchange title for logo
+            View logo = getLayoutInflater().inflate(R.layout.logo, null);
+            toolbar.setTitle("");
+            toolbar.addView(logo);
+            setSupportActionBar(toolbar);
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            navigationView.setNavigationItemSelectedListener(this);
 
             //intent for experience
             experienceIntent = new Intent(this, ExperienceActivity.class);
