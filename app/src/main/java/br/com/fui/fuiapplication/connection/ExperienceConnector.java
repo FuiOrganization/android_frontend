@@ -46,8 +46,10 @@ public class ExperienceConnector {
                     Experience e = new Experience(
                             object.getInt("id"),
                             object.getString("name"),
-                            object.getString("description"), object.getString("image_url"),
-                            object.getBoolean("sponsored")
+                            object.getString("description"),
+                            object.getString("image_url"),
+                            object.getBoolean("sponsored"),
+                            object.getBoolean("visited")
                     );
                     recommendations[i] = e;
                 }

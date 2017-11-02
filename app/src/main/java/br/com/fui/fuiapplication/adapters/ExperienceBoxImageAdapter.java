@@ -1,6 +1,8 @@
 package br.com.fui.fuiapplication.adapters;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,9 +46,11 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         LinearLayout linearLayout;
         LinearLayout shadowingLayout;
+        LinearLayout titleLayout;
         RelativeLayout relativeLayout;
         ImageView experienceImage;
         TextView experienceTitle;
+        ImageView pinIcon;
         TextView sponsorship;
 
         //if convertView isn't created yet
@@ -94,13 +98,16 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
             }
 
             experienceTitle = convertView.findViewById(R.id.experience_box_title);
+            pinIcon = convertView.findViewById(R.id.experience_box_ic_pin);
 
         } else {
             //get data
             linearLayout = (LinearLayout) convertView;
             shadowingLayout = (LinearLayout) linearLayout.getChildAt(0);
             relativeLayout = (RelativeLayout) shadowingLayout.getChildAt(0);
-            experienceTitle = (TextView) shadowingLayout.getChildAt(1);
+            titleLayout = (LinearLayout) shadowingLayout.getChildAt(1);
+            pinIcon = (ImageView) titleLayout.getChildAt(0);
+            experienceTitle = (TextView) titleLayout.getChildAt(1);
             experienceImage = (ImageView) relativeLayout.getChildAt(0);
             sponsorship = (TextView) relativeLayout.getChildAt(1);
             if (!experiences[position].isSponsored()) {
@@ -117,9 +124,16 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
         LoadImageTask loadImageTaskTask = new LoadImageTask(experiences[position].getImage(), experienceImage);
         loadImageTaskTask.execute((Void) null);
         experienceTitle.setText(experiences[position].getTitle());
-        //if is sponsored, add label
+
+        //if it's sponsored, add label
         if (experiences[position].isSponsored()) {
             sponsorship.setText(mContext.getString(R.string.sponsored_label));
+        }
+
+        //if user has already visited experience locale, change design
+        if (experiences[position].hasUserVisited()) {
+            pinIcon.setVisibility(View.VISIBLE);
+            experienceTitle.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
         }
 
         return linearLayout;

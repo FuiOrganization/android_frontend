@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/experience_box"
     android:layout_width="wrap_content"
@@ -39,14 +40,30 @@
                 android:layout_height="wrap_content" />
 
         </RelativeLayout>
-        
-        <TextView
-            android:id="@+id/experience_box_title"
+
+        <LinearLayout
+            android:id="@+id/experience_box_title_layout"
             android:gravity="center"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/experience_box_ic_pin"
+                android:visibility="invisible"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                app:srcCompat="@drawable/ic_pin" />
+
+            <TextView
+                android:id="@+id/experience_box_title"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
         
     </LinearLayout>
 
