@@ -35,4 +35,13 @@
         </menu>
     </item>
 
+    <item android:title="@string/settings">
+        <menu>
+            <item
+                android:id="@+id/nav_log_off"
+                android:icon="@mipmap/ic_menu_log_out"
+                android:title="@string/log_out" />
+        </menu>
+    </item>
+
 </menu>

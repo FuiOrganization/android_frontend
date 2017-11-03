@@ -2,6 +2,7 @@ package br.com.fui.fuiapplication.activities;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
 import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.dialogs.ConfirmationDialog;
 import br.com.fui.fuiapplication.helpers.AbstractTimer;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
@@ -40,6 +42,7 @@ import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    Intent loginIntent;
     private TextView mTextMessage;
     public static  GridView gridRecommendations;
     private Intent experienceIntent;
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
+            loginIntent = new Intent(this, LoginActivity.class);
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
 
@@ -211,6 +215,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_send) {
 
+        } else if(id == R.id.nav_log_off){
+
+            //confirmation action
+            DialogInterface.OnClickListener confirmationAction = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //nullify facebook access token
+                    AccessToken.setCurrentAccessToken(null);
+                    startActivity(loginIntent);
+                    finish();
+                }
+            };
+
+            //create confirmation dialog
+            ConfirmationDialog.create(getResources().getString(R.string.fui_confirmation_title),
+                    getResources().getString(R.string.log_out_confirmation_message),
+                    this,
+                    confirmationAction,
+                    null
+                    );
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
