@@ -19,7 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
 
 import java.util.ArrayList;
 
@@ -30,6 +34,7 @@ import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.Data;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
+import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -104,6 +109,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
+
+            View headerLayout = navigationView.getHeaderView(0);
+
+            //change nav header main data
+            ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
+            LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage);
+            profileImageTask.execute((Void) null);
+            TextView navigationProfileName = headerLayout.findViewById(R.id.nav_header_main_name_text);
+            navigationProfileName.setText(Data.name);
+            TextView navigationProfileDescription = headerLayout.findViewById(R.id.nav_header_main_name_description);
+            navigationProfileDescription.setText(Data.email);
+
 
             //intent for experience
             experienceIntent = new Intent(this, ExperienceActivity.class);

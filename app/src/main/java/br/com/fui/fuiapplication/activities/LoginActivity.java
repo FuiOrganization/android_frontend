@@ -18,6 +18,7 @@ import java.util.Arrays;
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.connection.ServerConnector;
 import br.com.fui.fuiapplication.data.Application;
+import br.com.fui.fuiapplication.data.Data;
 
 public class LoginActivity extends AppCompatActivity {
     CallbackManager callbackManager;
@@ -55,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         callbackManager = CallbackManager.Factory.create();
         LoginButton loginButton = (LoginButton) this.findViewById(R.id.login_button);
-        loginButton.setReadPermissions(Arrays.asList("user_status", "user_likes", "user_location"));
+        loginButton.setReadPermissions(Arrays.asList("user_status", "user_likes", "user_location", "email", "public_profile"));
 
         loginButton.registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
@@ -90,6 +91,9 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Void... voids) {
+            //update local facebook data
+            Data.getFacebookData();
+
             //verify if has saved account
             if(ServerConnector.hasSavedAccount(LoginActivity.this)){
                 return ServerConnector.AUTHORIZATION_CODE;
