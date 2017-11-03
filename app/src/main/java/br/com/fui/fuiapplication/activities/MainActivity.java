@@ -1,6 +1,7 @@
 package br.com.fui.fuiapplication.activities;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
 import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.helpers.AbstractTimer;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
 import br.com.fui.fuiapplication.tasks.LoadImageTask;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Intent experienceIntent;
     private GetRecommendations getRecommendationsTask;
     private SwipeRefreshLayout experienceSwipeRefresh;
+    private View headerLayout;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -110,17 +113,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
 
-            View headerLayout = navigationView.getHeaderView(0);
+            //get header layout
+            headerLayout = navigationView.getHeaderView(0);
 
-            //change nav header main data
-            ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
-            LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage);
-            profileImageTask.execute((Void) null);
-            TextView navigationProfileName = headerLayout.findViewById(R.id.nav_header_main_name_text);
-            navigationProfileName.setText(Data.name);
-            TextView navigationProfileDescription = headerLayout.findViewById(R.id.nav_header_main_name_description);
-            navigationProfileDescription.setText(Data.email);
-
+            NavigationHeaderTimer facebookDataTimer = new NavigationHeaderTimer(this);
+            facebookDataTimer.run();
 
             //intent for experience
             experienceIntent = new Intent(this, ExperienceActivity.class);
@@ -272,6 +269,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @Override
         protected void onCancelled() {
+        }
+    }
+
+    public class NavigationHeaderTimer extends AbstractTimer{
+
+        public NavigationHeaderTimer(Activity activity) {
+            super(activity);
+        }
+
+        @Override
+        protected boolean onVerification() {
+            //action is executed if name is not equal to empty string
+            return !Data.name.equals("");
+        }
+
+        @Override
+        protected void doInBackground() {
+            //change nav header main data
+            ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
+            LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage);
+            profileImageTask.execute((Void) null);
+            TextView navigationProfileName = headerLayout.findViewById(R.id.nav_header_main_name_text);
+            navigationProfileName.setText(Data.name);
+            TextView navigationProfileDescription = headerLayout.findViewById(R.id.nav_header_main_name_description);
+            navigationProfileDescription.setText(Data.email);
         }
     }
 }

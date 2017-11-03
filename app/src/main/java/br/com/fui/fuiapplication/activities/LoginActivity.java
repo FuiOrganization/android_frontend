@@ -91,8 +91,6 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Void... voids) {
-            //update local facebook data
-            Data.getFacebookData();
 
             //verify if has saved account
             if(ServerConnector.hasSavedAccount(LoginActivity.this)){
@@ -106,6 +104,8 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(final Integer code) {
             //if successfully, go to main activity
             if(code == ServerConnector.AUTHORIZATION_CODE){
+                //update local facebook data
+                Data.getFacebookData();
                 startActivity(mainIntent);
                 finish();
             }
