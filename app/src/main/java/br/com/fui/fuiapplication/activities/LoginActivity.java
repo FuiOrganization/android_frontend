@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mainIntent = new Intent(this, MainActivity.class);
 
-        //TODO debug mode is not working properly after fui authentication
+        //TODO debug mode is not working properly after development of fui authentication
         //skip facebook login and fake fui authentication
         if (Application.DEBUG_MODE) {
             //set test access token

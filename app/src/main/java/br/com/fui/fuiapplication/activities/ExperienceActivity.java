@@ -3,6 +3,7 @@ package br.com.fui.fuiapplication.activities;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -14,7 +15,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.dialogs.ConfirmationDialog;
 import br.com.fui.fuiapplication.models.Experience;
+import br.com.fui.fuiapplication.tasks.CheckinTask;
 import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 public class ExperienceActivity extends AppCompatActivity {
@@ -44,9 +47,25 @@ public class ExperienceActivity extends AppCompatActivity {
         FloatingActionButton fui_button = (FloatingActionButton) findViewById(R.id.fui_button);
         fui_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(final View view) {
+                //confirmation action
+                DialogInterface.OnClickListener confirmationAction = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //checkin async task
+                        CheckinTask checkinTask = new CheckinTask(experience, view);
+                        checkinTask.execute((Void) null);
+                    }
+                };
+
+                //create confirmation dialog
+                ConfirmationDialog.create(
+                        getResources().getString(R.string.fui_confirmation_title),
+                        String.format(getResources().getString(R.string.fui_confirmation_message), experience.getTitle()),
+                        ExperienceActivity.this,
+                        confirmationAction,
+                        null
+                );
             }
         });
 
@@ -77,7 +96,7 @@ public class ExperienceActivity extends AppCompatActivity {
         setTitle(experience.getTitle());
 
         //update appbar image
-        LoadImageTask loadImageTaskTask = new LoadImageTask(experience.getImage(), appBar);
-        loadImageTaskTask.execute((Void) null);
+        LoadImageTask loadImageTask = new LoadImageTask(experience.getImage(), appBar);
+        loadImageTask.execute((Void) null);
     }
 }

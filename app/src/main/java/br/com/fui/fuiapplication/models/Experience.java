@@ -7,17 +7,29 @@ import java.io.Serializable;
  */
 
 public class Experience implements Serializable {
+    private int id;
     private String title;
     private String description;
     private String image;
     private boolean sponsored;
+    private boolean hasUserVisited;
 
-    public Experience(String title, String description, String image, boolean sponsored) {
+    public Experience(int id, String title, String description, String image, boolean sponsored, boolean hasUserVisited) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.image = image;
         this.sponsored = sponsored;
+        this.hasUserVisited = hasUserVisited;
     }
+
+    public boolean hasUserVisited() { return hasUserVisited; }
+
+    public void setUserVisited(boolean hasUserVisited) { this.hasUserVisited = hasUserVisited; }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 
     public boolean isSponsored() {
         return sponsored;
