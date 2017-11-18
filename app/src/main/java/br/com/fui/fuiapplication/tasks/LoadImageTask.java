@@ -11,6 +11,8 @@ import android.support.design.widget.AppBarLayout;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -25,29 +27,27 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
     String imageUrl = "";
     ImageView imageView = null;
     AppBarLayout appBar = null;
+    Context context = null;
 
-    public LoadImageTask(String imageUrl, ImageView imageView) {
+    public LoadImageTask(String imageUrl, ImageView imageView, Context context) {
         this.imageUrl = imageUrl;
         this.imageView = imageView;
+        this.context = context;
     }
 
-    public LoadImageTask(String imageUrl, AppBarLayout appBar) {
+    public LoadImageTask(String imageUrl, AppBarLayout appBar, Context context) {
         this.imageUrl = imageUrl;
         this.appBar = appBar;
+        this.context = context;
     }
 
     @Override
     protected Bitmap doInBackground(Void... voids) {
         Bitmap bitmap = null;
         try {
-            //try to get bitmap from memory cache
-            bitmap = MemoryCache.getBitmapFromMemCache(this.imageUrl);
-            //if null, load from stream
-            if (bitmap == null) {
-                bitmap = BitmapFactory.decodeStream((InputStream) new URL(this.imageUrl).getContent());
-                //add to memory cache
-                MemoryCache.addBitmapToMemoryCache(this.imageUrl, bitmap);
-            }
+            bitmap = Picasso.with(context)
+                        .load(this.imageUrl)
+                        .get();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,11 +56,9 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(final Bitmap image) {
-        Context context;
         if (imageView != null) {
             imageView.setImageBitmap(image);
         } else if (appBar != null) {
-            context = appBar.getContext();
             Drawable drawableImage = new BitmapDrawable(context.getResources(), image);
             if (Build.VERSION.SDK_INT >= 16) {
                 appBar.setBackground(drawableImage);

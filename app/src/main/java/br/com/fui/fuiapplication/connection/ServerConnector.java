@@ -35,7 +35,7 @@ public class ServerConnector {
     //timeout in milliseconds
     private static final int timeout = 5000;
     private static final String c9IP = "";
-    private static final String localIP = "http://192.168.25.87:3000/";
+    private static final String localIP = "http://192.168.25.155:3000/";
     private static final String herokuIP = "https://fuiserver.herokuapp.com/";
     private static final String developmentIP = localIP;
     private static final String productionIP = herokuIP;
