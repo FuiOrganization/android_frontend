@@ -1,21 +1,31 @@
 package br.com.fui.fuiapplication.activities;
 
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
 
 import java.util.ArrayList;
 
@@ -24,16 +34,21 @@ import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
 import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.dialogs.ConfirmationDialog;
+import br.com.fui.fuiapplication.helpers.AbstractTimer;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
+import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    Intent loginIntent;
     private TextView mTextMessage;
     public static  GridView gridRecommendations;
     private Intent experienceIntent;
     private GetRecommendations getRecommendationsTask;
     private SwipeRefreshLayout experienceSwipeRefresh;
+    private View headerLayout;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -75,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
+            loginIntent = new Intent(this, LoginActivity.class);
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
 
@@ -84,10 +100,28 @@ public class MainActivity extends AppCompatActivity {
             //start resolution helper
             ResolutionHelper.start(this);
 
-            ActionBar actionBar = getSupportActionBar();
-            //custom action bar with logo
-            actionBar.setCustomView(R.layout.action_bar);
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            //Add toolbar
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            //Exchange title for logo
+            View logo = getLayoutInflater().inflate(R.layout.logo, null);
+            toolbar.setTitle("");
+            toolbar.addView(logo);
+            setSupportActionBar(toolbar);
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            navigationView.setNavigationItemSelectedListener(this);
+
+            //get header layout
+            headerLayout = navigationView.getHeaderView(0);
+
+            NavigationHeaderTimer facebookDataTimer = new NavigationHeaderTimer(this);
+            facebookDataTimer.run();
 
             //intent for experience
             experienceIntent = new Intent(this, ExperienceActivity.class);
@@ -129,6 +163,71 @@ public class MainActivity extends AppCompatActivity {
             );
 
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_log_off){
+
+            //confirmation action
+            DialogInterface.OnClickListener confirmationAction = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //nullify facebook access token
+                    AccessToken.setCurrentAccessToken(null);
+                    startActivity(loginIntent);
+                    finish();
+                }
+            };
+
+            //create confirmation dialog
+            ConfirmationDialog.create(getResources().getString(R.string.fui_confirmation_title),
+                    getResources().getString(R.string.log_out_confirmation_message),
+                    this,
+                    confirmationAction,
+                    null
+                    );
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     /*
@@ -182,6 +281,31 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
+        }
+    }
+
+    public class NavigationHeaderTimer extends AbstractTimer{
+
+        public NavigationHeaderTimer(Activity activity) {
+            super(activity);
+        }
+
+        @Override
+        protected boolean onVerification() {
+            //action is executed if name is not equal to empty string
+            return !Data.name.equals("");
+        }
+
+        @Override
+        protected void doInBackground() {
+            //change nav header main data
+            ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
+            LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage);
+            profileImageTask.execute((Void) null);
+            TextView navigationProfileName = headerLayout.findViewById(R.id.nav_header_main_name_text);
+            navigationProfileName.setText(Data.name);
+            TextView navigationProfileDescription = headerLayout.findViewById(R.id.nav_header_main_name_description);
+            navigationProfileDescription.setText(Data.email);
         }
     }
 }
