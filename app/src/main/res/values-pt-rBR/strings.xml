@@ -15,4 +15,7 @@
     <string name="fui_confirmation_message">Você tem certeza que deseja realizar Check-in em %1$s?</string>
     <string name="fui_confirmation_title">Confirmação</string>
     <string name="no_connection">Sem conexão com a internet!</string>
+    <string name="settings">Configurações</string>
+    <string name="log_out">Desconectar</string>
+    <string name="log_out_confirmation_message">Tem certeza que quer se desconectar?</string>
 </resources>

@@ -102,7 +102,7 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
             sponsorship = convertView.findViewById(R.id.experience_box_sponsorship);
 
             if (!experiences.get(position).isSponsored()) {
-                sponsorship.setVisibility(View.INVISIBLE);
+                sponsorship.setVisibility(View.GONE);
             }
 
             experienceTitle = convertView.findViewById(R.id.experience_box_title);
@@ -119,7 +119,7 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
             experienceImage = (ImageView) relativeLayout.getChildAt(0);
             sponsorship = (TextView) relativeLayout.getChildAt(1);
             if (!experiences.get(position).isSponsored()) {
-                sponsorship.setVisibility(View.INVISIBLE);
+                sponsorship.setVisibility(View.GONE);
             }
 
             //if it's the same source
@@ -129,21 +129,32 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
         }
 
         //set image and title
+        //CACHE
         Picasso.with(mContext)
                 .load(this.experiences.get(position).getImage())
                 .networkPolicy(NetworkPolicy.OFFLINE)
                 .into(experienceImage, new Callback() {
                     @Override
-                    public void onSuccess() {
-
-                    }
+                    public void onSuccess() {}
 
                     @Override
                     public void onError() {
+                        //NETWORK
                         if(Data.hasConnection){
                             Picasso.with(mContext)
                                     .load(experiences.get(position).getImage())
-                                    .into(experienceImage);
+                                    .into(experienceImage, new Callback() {
+
+                                        @Override
+                                        public void onSuccess() {}
+
+                                        @Override
+                                        public void onError() {
+                                            //CUSTOM MEMORY CACHE
+                                            LoadImageTask imageTask = new LoadImageTask(experiences.get(position).getImage(), experienceImage, mContext, false);
+                                            imageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                        }
+                                    });
                         }
                     }
                 });

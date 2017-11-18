@@ -97,7 +97,7 @@ public class ExperienceActivity extends AppCompatActivity {
         setTitle(experience.getTitle());
 
         //update appbar image
-        LoadImageTask loadImageTask = new LoadImageTask(experience.getImage(), appBar, this);
+        LoadImageTask loadImageTask = new LoadImageTask(experience.getImage(), appBar, this, true);
         loadImageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

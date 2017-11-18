@@ -30,32 +30,54 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
     ImageView imageView = null;
     AppBarLayout appBar = null;
     Context context = null;
+    boolean usePicasso;
 
-    public LoadImageTask(String imageUrl, ImageView imageView, Context context) {
+    public LoadImageTask(String imageUrl, ImageView imageView, Context context, boolean usePicasso) {
         this.imageUrl = imageUrl;
         this.imageView = imageView;
         this.context = context;
+        this.usePicasso = usePicasso;
     }
 
-    public LoadImageTask(String imageUrl, AppBarLayout appBar, Context context) {
+    public LoadImageTask(String imageUrl, AppBarLayout appBar, Context context, boolean usePicasso) {
         this.imageUrl = imageUrl;
         this.appBar = appBar;
         this.context = context;
+        this.usePicasso = usePicasso;
     }
 
-    @Override
-    protected Bitmap doInBackground(Void... voids) {
+    private Bitmap getFromPicasso(){
         Bitmap bitmap = null;
         try {
             bitmap = Picasso.with(context)
                     .load(this.imageUrl)
                     .networkPolicy(NetworkPolicy.OFFLINE)
                     .get();
-
             if(bitmap == null && Data.hasConnection){
                 Picasso.with(context)
                         .load(this.imageUrl)
                         .get();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    @Override
+    protected Bitmap doInBackground(Void... voids) {
+        //use picasso first
+        Bitmap bitmap = this.usePicasso ? getFromPicasso() : null;
+        try {
+            if(bitmap == null){
+                //try to get bitmap from memory cache
+                bitmap = MemoryCache.getBitmapFromMemCache(this.imageUrl);
+                if (bitmap == null) {
+                    bitmap = BitmapFactory.decodeStream((InputStream) new URL(this.imageUrl).getContent());
+                    //add to memory cache
+                    MemoryCache.addBitmapToMemoryCache(this.imageUrl, bitmap);
+                }
             }
 
         } catch (IOException e) {
