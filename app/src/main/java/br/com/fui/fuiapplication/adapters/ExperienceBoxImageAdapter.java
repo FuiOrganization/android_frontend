@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -49,12 +51,12 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
     }
 
     // create a new Layout containing ImageView and Text View for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         LinearLayout linearLayout;
         LinearLayout shadowingLayout;
         LinearLayout titleLayout;
         RelativeLayout relativeLayout;
-        ImageView experienceImage;
+        final ImageView experienceImage;
         TextView experienceTitle;
         ImageView pinIcon;
         TextView sponsorship;
@@ -129,7 +131,22 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
         //set image and title
         Picasso.with(mContext)
                 .load(this.experiences.get(position).getImage())
-                .into(experienceImage);
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .into(experienceImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        if(Data.hasConnection){
+                            Picasso.with(mContext)
+                                    .load(experiences.get(position).getImage())
+                                    .into(experienceImage);
+                        }
+                    }
+                });
 
         experienceTitle.setText(experiences.get(position).getTitle());
 

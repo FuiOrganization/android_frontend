@@ -11,6 +11,7 @@ import android.support.design.widget.AppBarLayout;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import br.com.fui.fuiapplication.cache.MemoryCache;
+import br.com.fui.fuiapplication.data.Data;
 
 /**
  * Created by guilherme on 14/10/17.
@@ -46,8 +48,16 @@ public class LoadImageTask extends AsyncTask<Void, Void, Bitmap> {
         Bitmap bitmap = null;
         try {
             bitmap = Picasso.with(context)
+                    .load(this.imageUrl)
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .get();
+
+            if(bitmap == null && Data.hasConnection){
+                Picasso.with(context)
                         .load(this.imageUrl)
                         .get();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

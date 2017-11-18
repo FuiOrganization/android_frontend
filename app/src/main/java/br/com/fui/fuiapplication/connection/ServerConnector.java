@@ -13,12 +13,16 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import br.com.fui.fuiapplication.data.Application;
+import br.com.fui.fuiapplication.data.CustomSharedPreferences;
+import br.com.fui.fuiapplication.data.Data;
 
 /**
  * Created by guilherme on 13/10/17.
@@ -43,8 +47,6 @@ public class ServerConnector {
     private static boolean validToken = false;
     private static String facebook_identifier = "";
     private static Context appContext;
-    private static SharedPreferences settings;
-    public static final String PREFS_NAME = "Fui";
     //limit multiple request attempts
     public static final int maxAttempts = 3;
 
@@ -61,7 +63,7 @@ public class ServerConnector {
      * Sends a request to the server
      * @param action    the server action requested
      * @param info      json data
-     * @return the ResponseMessage object for the request. Returns null if connection is unsuccessful.
+     * @return the ResponseMessage object for the request. Returns null if hasConnection is unsuccessful.
      */
     public static ResponseMessage sendRequest(String action, JSONObject info, int attempt){
         //new attempt
@@ -124,13 +126,21 @@ public class ServerConnector {
                 sb.append(output);
             }
 
+            Data.hasConnection = true;
             response = new ResponseMessage(connection.getResponseCode(), connection.getResponseMessage(),
                     sb.toString());
 
             Log.d("request", sb.toString());
 
-        }catch(SocketTimeoutException e){
+        } catch(SocketTimeoutException e) {
             response = new ResponseMessage(NO_CONNECTION_CODE, "", "");
+            Data.hasConnection = false;
+        } catch(UnknownHostException e) {
+            response = new ResponseMessage(NO_CONNECTION_CODE, "", "");
+            Data.hasConnection = false;
+        } catch(ConnectException e){
+            response = new ResponseMessage(NO_CONNECTION_CODE, "", "");
+            Data.hasConnection = false;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -193,7 +203,7 @@ public class ServerConnector {
         ServerConnector.token = jwt;
         ServerConnector.validToken = true;
         ServerConnector.facebook_identifier = facebook_identifier;
-        SharedPreferences.Editor editor = ServerConnector.settings.edit();
+        SharedPreferences.Editor editor = CustomSharedPreferences.settings.edit();
         editor.putString("facebook_identifier", facebook_identifier);
         editor.putString("token", jwt);
         editor.commit();
@@ -205,9 +215,9 @@ public class ServerConnector {
      * @return  whether there's a saved account or not
      */
     public static boolean retrieveData(){
-        if(ServerConnector.settings.contains("facebook_identifier")){
-            ServerConnector.facebook_identifier = ServerConnector.settings.getString("facebook_identifier", "");
-            ServerConnector.token = ServerConnector.settings.getString("token", "");
+        if(CustomSharedPreferences.settings.contains("facebook_identifier")){
+            ServerConnector.facebook_identifier = CustomSharedPreferences.settings.getString("facebook_identifier", "");
+            ServerConnector.token = CustomSharedPreferences.settings.getString("token", "");
             validToken = true;
             return true;
         }
@@ -222,7 +232,7 @@ public class ServerConnector {
      */
     public static boolean hasSavedAccount(Context context){
         ServerConnector.appContext = context;
-        ServerConnector.settings = appContext.getSharedPreferences(PREFS_NAME, 0);
+        CustomSharedPreferences.settings = appContext.getSharedPreferences(CustomSharedPreferences.PREFS_NAME, 0);
         return retrieveData();
     }
 

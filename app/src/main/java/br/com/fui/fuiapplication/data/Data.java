@@ -9,5 +9,6 @@ import br.com.fui.fuiapplication.models.Experience;
  */
 
 public class Data {
+    public static boolean hasConnection = false;
     public static ArrayList<Experience> recommendations = null;
 }

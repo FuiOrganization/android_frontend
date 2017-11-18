@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -21,8 +20,8 @@ import java.util.ArrayList;
 
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
-import br.com.fui.fuiapplication.cache.MemoryCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
+import br.com.fui.fuiapplication.data.CustomSharedPreferences;
 import br.com.fui.fuiapplication.data.Data;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
@@ -42,21 +41,21 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setVisibility(View.INVISIBLE);
+                    mTextMessage.setVisibility(View.GONE);
                     gridRecommendations.setVisibility(View.VISIBLE);
                     experienceSwipeRefresh.setVisibility(View.VISIBLE);
                     return true;
                 case R.id.navigation_favorites:
                     mTextMessage.setText(R.string.title_favorites);
                     mTextMessage.setVisibility(View.VISIBLE);
-                    gridRecommendations.setVisibility(View.INVISIBLE);
-                    experienceSwipeRefresh.setVisibility(View.INVISIBLE);
+                    gridRecommendations.setVisibility(View.GONE);
+                    experienceSwipeRefresh.setVisibility(View.GONE);
                     return true;
                 case R.id.navigation_history:
                     mTextMessage.setText(R.string.title_history);
                     mTextMessage.setVisibility(View.VISIBLE);
-                    gridRecommendations.setVisibility(View.INVISIBLE);
-                    experienceSwipeRefresh.setVisibility(View.INVISIBLE);
+                    gridRecommendations.setVisibility(View.GONE);
+                    experienceSwipeRefresh.setVisibility(View.GONE);
                     return true;
             }
             return false;
@@ -78,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
 
-            //start memory cache
-            MemoryCache.start();
+            //start memory cache: deprecated
+            //MemoryCache.start();
 
             //start resolution helper
             ResolutionHelper.start(this);
@@ -137,12 +136,26 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateExperiences() {
         //hide text message
-        mTextMessage.setVisibility(View.INVISIBLE);
+        mTextMessage.setVisibility(View.GONE);
         //nullify current experiences
         Data.recommendations = null;
         //execute new task
         getRecommendationsTask = new GetRecommendations();
         getRecommendationsTask.execute((Void) null);
+    }
+
+    private void showNoMessage(){
+        mTextMessage.setVisibility(View.GONE);
+    }
+
+    private void showNoData(){
+        mTextMessage.setText(R.string.message_error_retrieve_data);
+        mTextMessage.setVisibility(View.VISIBLE);
+    }
+
+    private void showNoConnectionError(){
+        mTextMessage.setText(R.string.no_connection);
+        mTextMessage.setVisibility(View.VISIBLE);
     }
 
     public class GetRecommendations extends AsyncTask<Void, Void, ArrayList<Experience>> {
@@ -165,15 +178,22 @@ public class MainActivity extends AppCompatActivity {
 
             //if it couldn't retrieve any data
             if (Data.recommendations == null || Data.recommendations.size() == 0) {
-                mTextMessage.setText(R.string.message_error_retrieve_data);
-                mTextMessage.setVisibility(View.VISIBLE);
-                MainActivity.this.gridRecommendations.setVisibility(View.INVISIBLE);
+                if(!Data.hasConnection){
+                    showNoConnectionError();
+                    ArrayList<Experience> cachedExperiences = CustomSharedPreferences.getRecommendations();
+                    if(cachedExperiences != null){
+                        Data.recommendations = cachedExperiences;
+                        MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
+                    }
+                }else{
+                    showNoData();
+                    MainActivity.this.gridRecommendations.setVisibility(View.GONE);
+                }
             } else {
-                mTextMessage.setVisibility(View.INVISIBLE);
+                showNoMessage();
                 MainActivity.this.gridRecommendations.setVisibility(View.VISIBLE);
+                MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
             }
-
-            MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
 
             //cancel animation
             experienceSwipeRefresh.setRefreshing(false);
