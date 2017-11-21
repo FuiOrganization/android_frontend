@@ -25,13 +25,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
-import br.com.fui.fuiapplication.cache.MemoryCache;
+import br.com.fui.fuiapplication.cache.DiskCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.CustomSharedPreferences;
 import br.com.fui.fuiapplication.data.Data;
@@ -39,7 +41,6 @@ import br.com.fui.fuiapplication.dialogs.ConfirmationDialog;
 import br.com.fui.fuiapplication.helpers.AbstractTimer;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
-import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -91,9 +92,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
-
-            //start memory cache: (not picasso)
-            MemoryCache.start();
 
             //start resolution helper
             ResolutionHelper.start(this);
@@ -240,8 +238,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             DialogInterface.OnClickListener confirmationAction = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    //clear sharedPreferences
+                    CustomSharedPreferences.clear();
+                    //delete app disk cache
+                    DiskCache.deleteDirectoryTree(MainActivity.this.getCacheDir());
                     //nullify facebook access token
                     AccessToken.setCurrentAccessToken(null);
+                    //go to login screen
                     startActivity(loginIntent);
                     finish();
                 }
@@ -279,9 +282,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         protected void doInBackground() {
             //change nav header main data
-            ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
-            LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage, MainActivity.this, false);
-            profileImageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            final ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
+            //deprecated
+            //LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage, MainActivity.this, false);
+            //profileImageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            //set profile picture
+            //CACHE
+            Picasso.with(MainActivity.this)
+                    .load(Data.profilePic)
+                    //deprecated, for some reason, picasso can't cache this image
+                    //.networkPolicy(NetworkPolicy.OFFLINE)
+                    .into(navigationProfileImage, new Callback() {
+                        @Override
+                        public void onSuccess() {}
+
+                        @Override
+                        public void onError() {
+                            //NETWORK
+                            //deprecated
+                            /*
+                            if(Data.hasConnection){
+                                Picasso.with(MainActivity.this)
+                                        .load(Data.profilePic)
+                                        .into(navigationProfileImage);
+                            }
+                            */
+                        }
+                    });
             TextView navigationProfileName = headerLayout.findViewById(R.id.nav_header_main_name_text);
             navigationProfileName.setText(Data.name);
             TextView navigationProfileDescription = headerLayout.findViewById(R.id.nav_header_main_name_description);

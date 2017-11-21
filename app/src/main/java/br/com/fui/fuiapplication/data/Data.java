@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import br.com.fui.fuiapplication.models.Experience;
+import br.com.fui.fuiapplication.models.FacebookProfile;
 
 /**
  * Created by guilherme on 18/10/17.
@@ -23,9 +24,14 @@ import br.com.fui.fuiapplication.models.Experience;
 public class Data {
     public static boolean hasConnection = false;
     public static ArrayList<Experience> recommendations = null;
+    public static String facebookUserId;
     public static String name = "";
     public static String email = "";
     public static String profilePic = "";
+
+    private static String createProfilePicUrl(String userId){
+        return "https://graph.facebook.com/" + userId + "/picture?type=large";
+    }
 
     public static void getFacebookData() {
         FacebookSdk.addLoggingBehavior(LoggingBehavior.REQUESTS);
@@ -38,9 +44,14 @@ public class Data {
                             GraphResponse response) {
                         try {
                             if (object != null) {
+                                Data.facebookUserId = object.getString("id");
                                 Data.name = object.getString("name");
                                 Data.email = object.getString("email");
-                                Data.profilePic = object.getJSONObject("picture").getJSONObject("data").getString("url");
+                                //deprecated
+                                //Data.profilePic = object.getJSONObject("picture").getJSONObject("data").getString("url");
+                                Data.profilePic = createProfilePicUrl(Data.facebookUserId);
+                                FacebookProfile fbProfile = new FacebookProfile(Data.facebookUserId, Data.name, Data.email, Data.profilePic);
+                                CustomSharedPreferences.updateFacebookProfile(fbProfile);
                             }
 
                         } catch (JSONException e) {
@@ -49,7 +60,7 @@ public class Data {
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "name, email, picture.type(large)");
+        parameters.putString("fields", "id, name, email, picture.type(large)");
         request.setParameters(parameters);
         request.executeAsync();
     }

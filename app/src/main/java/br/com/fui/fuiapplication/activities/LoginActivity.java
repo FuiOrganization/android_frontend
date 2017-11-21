@@ -18,7 +18,9 @@ import java.util.Arrays;
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.connection.ServerConnector;
 import br.com.fui.fuiapplication.data.Application;
+import br.com.fui.fuiapplication.data.CustomSharedPreferences;
 import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.models.FacebookProfile;
 
 public class LoginActivity extends AppCompatActivity {
     CallbackManager callbackManager;
@@ -104,8 +106,11 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(final Integer code) {
             //if successfully, go to main activity
             if(code == ServerConnector.AUTHORIZATION_CODE){
-                //update local facebook data
-                Data.getFacebookData();
+                //check if cache fails
+                if(!CustomSharedPreferences.loadFacebookProfile()) {
+                    //update local facebook data
+                    Data.getFacebookData();
+                }
                 startActivity(mainIntent);
                 finish();
             }
