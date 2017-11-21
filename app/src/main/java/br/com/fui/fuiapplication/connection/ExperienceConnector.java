@@ -4,9 +4,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 import br.com.fui.fuiapplication.data.CustomSharedPreferences;
+import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.models.Checkin;
 import br.com.fui.fuiapplication.models.Experience;
 
 /**
@@ -15,6 +21,52 @@ import br.com.fui.fuiapplication.models.Experience;
 
 public class ExperienceConnector {
 
+    /**
+     * Sends a request to server for user check-in history
+     * @return ArrayList of check-ins
+     */
+    public static ArrayList<Checkin> getHistory(){
+        //deal with date
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        ArrayList<Checkin> history = new ArrayList<>();
+
+        ResponseMessage response = ServerConnector.sendRequest("checkin/history", null, 0);
+        try {
+            if (response != null) {
+                JSONArray jsonArray = new JSONArray(response.getBody());
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    Checkin c = new Checkin(
+                            object.getInt("experience_id"),
+                            "Experience Name",
+                            new Date(sdf.parse(object.getString("created_at").substring(0, 19)).getTime())
+                    );
+                    history.add(c);
+                }
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //save on shared preferences
+        if(history.size() > 0){
+            CustomSharedPreferences.updateHistory(history);
+        }
+
+        return history;
+    }
+
+    /**
+     * Sends a check-in request to server
+     * @param experience_id experience ID
+     * @return whether the check-in was successfully or not
+     */
     public static boolean checkin(int experience_id){
         JSONObject holder = new JSONObject();
         try {
@@ -32,11 +84,11 @@ public class ExperienceConnector {
     }
 
     /**
-     * Sends a request to server for four recommendations
+     * Sends a request to server for four random recommendations
      * @return ArrayList of recommendations
      */
     public static ArrayList<Experience> getRecommendations() {
-        ArrayList<Experience> recommendations = new ArrayList<Experience>();
+        ArrayList<Experience> recommendations = new ArrayList<>();
 
         ResponseMessage response = ServerConnector.sendRequest("recommendations/recommend", null, 0);
         try {

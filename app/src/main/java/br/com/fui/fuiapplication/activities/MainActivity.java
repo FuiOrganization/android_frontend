@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 import com.facebook.AccessToken;
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -40,6 +39,7 @@ import br.com.fui.fuiapplication.data.Data;
 import br.com.fui.fuiapplication.dialogs.ConfirmationDialog;
 import br.com.fui.fuiapplication.helpers.AbstractTimer;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
+import br.com.fui.fuiapplication.models.Checkin;
 import br.com.fui.fuiapplication.models.Experience;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static  GridView gridRecommendations;
     private Intent experienceIntent;
     private GetRecommendations getRecommendationsTask;
+    private GetHistory getHistoryTask;
     private SwipeRefreshLayout experienceSwipeRefresh;
     private View headerLayout;
 
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case R.id.navigation_history:
                     showMessage(R.string.title_history);
                     hideMainScreen();
+                    checkHistory();
                     return true;
             }
             return false;
@@ -267,9 +269,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * Class used to update navigation user profile
      */
-    public class NavigationHeaderTimer extends AbstractTimer{
+    private class NavigationHeaderTimer extends AbstractTimer{
 
-        public NavigationHeaderTimer(Activity activity) {
+        private NavigationHeaderTimer(Activity activity) {
             super(activity);
         }
 
@@ -321,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /*
      * On swipe action, call this function
-     * it must reload the experiences, on grid recommendations task it must cancel the animation
+     * it must reload the experiences, on get recommendations task it must cancel the animation
      */
     private void updateExperiences() {
         //hide text message
@@ -362,16 +364,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ArrayList<Experience> cachedExperiences = CustomSharedPreferences.getRecommendations();
                     if(cachedExperiences != null){
                         Data.recommendations = cachedExperiences;
-                        MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
+                        MainActivity.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
                     }
                 }else{
                     showNoDataErrorMessage();
-                    MainActivity.this.gridRecommendations.setVisibility(View.GONE);
+                    MainActivity.gridRecommendations.setVisibility(View.GONE);
                 }
             } else {
                 showNoMessage();
-                MainActivity.this.gridRecommendations.setVisibility(View.VISIBLE);
-                MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
+                MainActivity.gridRecommendations.setVisibility(View.VISIBLE);
+                MainActivity.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
             }
 
             //cancel animation
@@ -383,4 +385,80 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         protected void onCancelled() {
         }
     }
+
+    /*========================================HISTORY========================================*/
+    public void checkHistory(){
+        if(Data.history == null){
+            updateHistory();
+        }
+    }
+
+    /*
+     * On swipe action, call this function
+     * it must reload history, on get history task it must cancel the animation
+     */
+    private void updateHistory() {
+        //hide text message
+        mTextMessage.setVisibility(View.GONE);
+        //nullify current experiences
+        Data.history = null;
+        //execute new task
+        getHistoryTask = new GetHistory();
+        getHistoryTask.execute((Void) null);
+    }
+
+    /**
+     * Class used to update history screen
+     */
+
+    public class GetHistory extends AsyncTask<Void, Void, ArrayList<Checkin>> {
+
+        GetHistory() {
+        }
+
+        @Override
+        protected ArrayList<Checkin> doInBackground(Void... voids) {
+            //get recommendations if current data is null
+            if (Data.history == null) {
+                Data.history = ExperienceConnector.getHistory();
+                return Data.history;
+            }
+            return Data.history;
+        }
+
+        @Override
+        protected void onPostExecute(final ArrayList<Checkin> history) {
+
+            //if it couldn't retrieve any data
+            if (Data.history == null || Data.history.size() == 0) {
+                if(!Data.hasConnection){
+                    showNoConnectionError();
+                    ArrayList<Checkin> cachedHistory = CustomSharedPreferences.getHistory();
+                    if(cachedHistory != null){
+                        Data.history = cachedHistory;
+                        //TODO gridHistory update
+                    }
+                }else{
+                    showNoDataErrorMessage();
+                    //TODO gridHistory GONE
+                }
+            } else {
+                showNoMessage();
+                //TODO gridHistory Update
+
+                /*for(Checkin c : history){
+                    Log.d("checkin", c.getExperienceId()+" "+c.getExperienceName()+" "+c.getCreatedAt());
+                }*/
+            }
+
+            //cancel animation
+            experienceSwipeRefresh.setRefreshing(false);
+
+        }
+
+        @Override
+        protected void onCancelled() {
+        }
+    }
+
 }

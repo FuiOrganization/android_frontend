@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import br.com.fui.fuiapplication.models.Checkin;
 import br.com.fui.fuiapplication.models.Experience;
 import br.com.fui.fuiapplication.models.FacebookProfile;
 
@@ -23,6 +24,7 @@ import br.com.fui.fuiapplication.models.FacebookProfile;
 
 public class Data {
     public static boolean hasConnection = false;
+    public static ArrayList<Checkin> history = null;
     public static ArrayList<Experience> recommendations = null;
     public static String facebookUserId;
     public static String name = "";
