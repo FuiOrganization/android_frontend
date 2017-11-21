@@ -11,6 +11,7 @@
     <string name="title_activity_experience">Experience</string>
     <string name="log_out_confirmation_message">Are you sure you want to log out?</string>
     <string name="message_error_retrieve_data">It was not possible to retrieve data, try again later.</string>
+    <string name="no_connection">No internet connection!</string>
     <string name="fui_success_message">You\'ve been sucessfully checked in!</string>
     <string name="fui_failure_message">It was not possible to confirm your check in for some reason.</string>
     <string name="fui_confirmation_title">Confirmation</string>

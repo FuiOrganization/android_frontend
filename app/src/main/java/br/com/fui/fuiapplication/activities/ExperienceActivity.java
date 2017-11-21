@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -96,7 +97,7 @@ public class ExperienceActivity extends AppCompatActivity {
         setTitle(experience.getTitle());
 
         //update appbar image
-        LoadImageTask loadImageTask = new LoadImageTask(experience.getImage(), appBar);
-        loadImageTask.execute((Void) null);
+        LoadImageTask loadImageTask = new LoadImageTask(experience.getImage(), appBar, this, true);
+        loadImageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

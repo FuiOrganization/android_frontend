@@ -25,20 +25,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
-import br.com.fui.fuiapplication.cache.MemoryCache;
+import br.com.fui.fuiapplication.cache.DiskCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
+import br.com.fui.fuiapplication.data.CustomSharedPreferences;
 import br.com.fui.fuiapplication.data.Data;
 import br.com.fui.fuiapplication.dialogs.ConfirmationDialog;
 import br.com.fui.fuiapplication.helpers.AbstractTimer;
 import br.com.fui.fuiapplication.helpers.ResolutionHelper;
 import br.com.fui.fuiapplication.models.Experience;
-import br.com.fui.fuiapplication.tasks.LoadImageTask;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -50,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout experienceSwipeRefresh;
     private View headerLayout;
 
+    //NAVIGATION ITEMS
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -57,21 +60,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setVisibility(View.INVISIBLE);
-                    gridRecommendations.setVisibility(View.VISIBLE);
-                    experienceSwipeRefresh.setVisibility(View.VISIBLE);
+                    showMainScreen();
                     return true;
                 case R.id.navigation_favorites:
-                    mTextMessage.setText(R.string.title_favorites);
-                    mTextMessage.setVisibility(View.VISIBLE);
-                    gridRecommendations.setVisibility(View.INVISIBLE);
-                    experienceSwipeRefresh.setVisibility(View.INVISIBLE);
+                    showMessage(R.string.title_favorites);
+                    hideMainScreen();
                     return true;
                 case R.id.navigation_history:
-                    mTextMessage.setText(R.string.title_history);
-                    mTextMessage.setVisibility(View.VISIBLE);
-                    gridRecommendations.setVisibility(View.INVISIBLE);
-                    experienceSwipeRefresh.setVisibility(View.INVISIBLE);
+                    showMessage(R.string.title_history);
+                    hideMainScreen();
                     return true;
             }
             return false;
@@ -82,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
-
     }
 
     @Override
@@ -90,17 +86,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
+            //INTENTS
             loginIntent = new Intent(this, LoginActivity.class);
+            experienceIntent = new Intent(this, ExperienceActivity.class);
+
             Log.d("main_activity", "Creating main activity");
             setContentView(R.layout.activity_main);
-
-            //start memory cache
-            MemoryCache.start();
 
             //start resolution helper
             ResolutionHelper.start(this);
 
-            //Add toolbar
+            //TOOLBAR
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             //Exchange title for logo
             View logo = getLayoutInflater().inflate(R.layout.logo, null);
@@ -108,35 +104,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             toolbar.addView(logo);
             setSupportActionBar(toolbar);
 
+            //NAVIGATION
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.addDrawerListener(toggle);
             toggle.syncState();
-
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener(this);
-
-            //get header layout
-            headerLayout = navigationView.getHeaderView(0);
-
-            NavigationHeaderTimer facebookDataTimer = new NavigationHeaderTimer(this);
-            facebookDataTimer.run();
-
-            //intent for experience
-            experienceIntent = new Intent(this, ExperienceActivity.class);
-
-            mTextMessage = (TextView) findViewById(R.id.message);
-            mTextMessage.setVisibility(View.INVISIBLE);
             BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
             navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-            gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
+            //NAVIGATION USER PROFILE
+            headerLayout = navigationView.getHeaderView(0);
+            NavigationHeaderTimer facebookDataTimer = new NavigationHeaderTimer(this);
+            facebookDataTimer.run();
 
+            //MESSAGE
+            mTextMessage = (TextView) findViewById(R.id.message);
+            showNoMessage();
+
+            //RECOMMENDATIONS
+            gridRecommendations = (GridView) findViewById(R.id.grid_recommendations);
             getRecommendationsTask = new GetRecommendations();
             getRecommendationsTask.execute((Void) null);
-
-
             gridRecommendations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
@@ -145,13 +136,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
 
+            //SWIPE REFRESH
             experienceSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.experience_swipe_refresh);
-
             //if recommendations are not loaded yet, start animation
             if (Data.recommendations == null || Data.recommendations.size() == 0) {
                 experienceSwipeRefresh.setRefreshing(true);
             }
-
             //on swipe to refresh
             experienceSwipeRefresh.setOnRefreshListener(
                     new SwipeRefreshLayout.OnRefreshListener() {
@@ -164,6 +154,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
     }
+
+    /*========================================MESSAGES========================================*/
+
+    private void showMainScreen(){
+        showNoMessage();
+        gridRecommendations.setVisibility(View.VISIBLE);
+        experienceSwipeRefresh.setVisibility(View.VISIBLE);
+        mTextMessage.setTextColor(getResources().getColor(R.color.black));
+    }
+
+    private void hideMainScreen(){
+        gridRecommendations.setVisibility(View.GONE);
+        experienceSwipeRefresh.setVisibility(View.GONE);
+    }
+
+    private void showMessage(int messageId){
+        mTextMessage.setText(messageId);
+        mTextMessage.setVisibility(View.VISIBLE);
+        mTextMessage.setTextColor(getResources().getColor(R.color.black));
+    }
+
+    private void showNoMessage(){
+        mTextMessage.setVisibility(View.GONE);
+        mTextMessage.setText("");
+    }
+
+    private void showNoDataErrorMessage(){
+        mTextMessage.setText(R.string.message_error_retrieve_data);
+        mTextMessage.setVisibility(View.VISIBLE);
+        mTextMessage.setTextColor(getResources().getColor(R.color.alert));
+    }
+
+    private void showNoConnectionError(){
+        mTextMessage.setText(R.string.no_connection);
+        mTextMessage.setVisibility(View.VISIBLE);
+        mTextMessage.setTextColor(getResources().getColor(R.color.alert));
+    }
+
+    /*========================================NAVIGATION========================================*/
 
     @Override
     public void onBackPressed() {
@@ -209,8 +238,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             DialogInterface.OnClickListener confirmationAction = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    //clear sharedPreferences
+                    CustomSharedPreferences.clear();
+                    //delete app disk cache
+                    DiskCache.deleteDirectoryTree(MainActivity.this.getCacheDir());
                     //nullify facebook access token
                     AccessToken.setCurrentAccessToken(null);
+                    //go to login screen
                     startActivity(loginIntent);
                     finish();
                 }
@@ -230,19 +264,78 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    /**
+     * Class used to update navigation user profile
+     */
+    public class NavigationHeaderTimer extends AbstractTimer{
+
+        public NavigationHeaderTimer(Activity activity) {
+            super(activity);
+        }
+
+        @Override
+        protected boolean onVerification() {
+            //action is executed if name is not equal to empty string
+            return !Data.name.equals("");
+        }
+
+        @Override
+        protected void doInBackground() {
+            //change nav header main data
+            final ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
+            //deprecated
+            //LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage, MainActivity.this, false);
+            //profileImageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            //set profile picture
+            //CACHE
+            Picasso.with(MainActivity.this)
+                    .load(Data.profilePic)
+                    //deprecated, for some reason, picasso can't cache this image
+                    //.networkPolicy(NetworkPolicy.OFFLINE)
+                    .into(navigationProfileImage, new Callback() {
+                        @Override
+                        public void onSuccess() {}
+
+                        @Override
+                        public void onError() {
+                            //NETWORK
+                            //deprecated
+                            /*
+                            if(Data.hasConnection){
+                                Picasso.with(MainActivity.this)
+                                        .load(Data.profilePic)
+                                        .into(navigationProfileImage);
+                            }
+                            */
+                        }
+                    });
+            TextView navigationProfileName = headerLayout.findViewById(R.id.nav_header_main_name_text);
+            navigationProfileName.setText(Data.name);
+            TextView navigationProfileDescription = headerLayout.findViewById(R.id.nav_header_main_name_description);
+            navigationProfileDescription.setText(Data.email);
+        }
+    }
+
+    /*========================================EXPERIENCES========================================*/
+
     /*
      * On swipe action, call this function
      * it must reload the experiences, on grid recommendations task it must cancel the animation
      */
     private void updateExperiences() {
         //hide text message
-        mTextMessage.setVisibility(View.INVISIBLE);
+        mTextMessage.setVisibility(View.GONE);
         //nullify current experiences
         Data.recommendations = null;
         //execute new task
         getRecommendationsTask = new GetRecommendations();
         getRecommendationsTask.execute((Void) null);
     }
+
+    /**
+     * Class used to update recommendations screen
+     */
 
     public class GetRecommendations extends AsyncTask<Void, Void, ArrayList<Experience>> {
 
@@ -264,15 +357,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             //if it couldn't retrieve any data
             if (Data.recommendations == null || Data.recommendations.size() == 0) {
-                mTextMessage.setText(R.string.message_error_retrieve_data);
-                mTextMessage.setVisibility(View.VISIBLE);
-                MainActivity.this.gridRecommendations.setVisibility(View.INVISIBLE);
+                if(!Data.hasConnection){
+                    showNoConnectionError();
+                    ArrayList<Experience> cachedExperiences = CustomSharedPreferences.getRecommendations();
+                    if(cachedExperiences != null){
+                        Data.recommendations = cachedExperiences;
+                        MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
+                    }
+                }else{
+                    showNoDataErrorMessage();
+                    MainActivity.this.gridRecommendations.setVisibility(View.GONE);
+                }
             } else {
-                mTextMessage.setVisibility(View.INVISIBLE);
+                showNoMessage();
                 MainActivity.this.gridRecommendations.setVisibility(View.VISIBLE);
+                MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
             }
-
-            MainActivity.this.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
 
             //cancel animation
             experienceSwipeRefresh.setRefreshing(false);
@@ -281,31 +381,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @Override
         protected void onCancelled() {
-        }
-    }
-
-    public class NavigationHeaderTimer extends AbstractTimer{
-
-        public NavigationHeaderTimer(Activity activity) {
-            super(activity);
-        }
-
-        @Override
-        protected boolean onVerification() {
-            //action is executed if name is not equal to empty string
-            return !Data.name.equals("");
-        }
-
-        @Override
-        protected void doInBackground() {
-            //change nav header main data
-            ImageView navigationProfileImage = headerLayout.findViewById(R.id.nav_header_main_profile_image);
-            LoadImageTask profileImageTask = new LoadImageTask(Data.profilePic, navigationProfileImage);
-            profileImageTask.execute((Void) null);
-            TextView navigationProfileName = headerLayout.findViewById(R.id.nav_header_main_name_text);
-            navigationProfileName.setText(Data.name);
-            TextView navigationProfileDescription = headerLayout.findViewById(R.id.nav_header_main_name_description);
-            navigationProfileDescription.setText(Data.email);
         }
     }
 }

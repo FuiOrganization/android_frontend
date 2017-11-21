@@ -1,6 +1,7 @@
 package br.com.fui.fuiapplication.adapters;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -46,12 +51,12 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
     }
 
     // create a new Layout containing ImageView and Text View for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         LinearLayout linearLayout;
         LinearLayout shadowingLayout;
         LinearLayout titleLayout;
         RelativeLayout relativeLayout;
-        ImageView experienceImage;
+        final ImageView experienceImage;
         TextView experienceTitle;
         ImageView pinIcon;
         TextView sponsorship;
@@ -97,7 +102,7 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
             sponsorship = convertView.findViewById(R.id.experience_box_sponsorship);
 
             if (!experiences.get(position).isSponsored()) {
-                sponsorship.setVisibility(View.INVISIBLE);
+                sponsorship.setVisibility(View.GONE);
             }
 
             experienceTitle = convertView.findViewById(R.id.experience_box_title);
@@ -114,7 +119,7 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
             experienceImage = (ImageView) relativeLayout.getChildAt(0);
             sponsorship = (TextView) relativeLayout.getChildAt(1);
             if (!experiences.get(position).isSponsored()) {
-                sponsorship.setVisibility(View.INVISIBLE);
+                sponsorship.setVisibility(View.GONE);
             }
 
             //if it's the same source
@@ -123,9 +128,37 @@ public class ExperienceBoxImageAdapter extends BaseAdapter {
             }
         }
 
-        //set image and title on asynctask
-        LoadImageTask loadImageTaskTask = new LoadImageTask(experiences.get(position).getImage(), experienceImage);
-        loadImageTaskTask.execute((Void) null);
+        //set image and title
+        //CACHE
+        Picasso.with(mContext)
+                .load(this.experiences.get(position).getImage())
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .into(experienceImage, new Callback() {
+                    @Override
+                    public void onSuccess() {}
+
+                    @Override
+                    public void onError() {
+                        //NETWORK
+                        if(Data.hasConnection){
+                            Picasso.with(mContext)
+                                    .load(experiences.get(position).getImage())
+                                    .into(experienceImage, new Callback() {
+
+                                        @Override
+                                        public void onSuccess() {}
+
+                                        @Override
+                                        public void onError() {
+                                            //CUSTOM MEMORY CACHE
+                                            LoadImageTask imageTask = new LoadImageTask(experiences.get(position).getImage(), experienceImage, mContext, false);
+                                            imageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                        }
+                                    });
+                        }
+                    }
+                });
+
         experienceTitle.setText(experiences.get(position).getTitle());
 
         //if it's sponsored, add label

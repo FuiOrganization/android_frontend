@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import br.com.fui.fuiapplication.data.CustomSharedPreferences;
 import br.com.fui.fuiapplication.models.Experience;
 
 /**
@@ -58,6 +59,11 @@ public class ExperienceConnector {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+        //save on shared preferences
+        if(recommendations.size() > 0){
+            CustomSharedPreferences.updateRecommendations(recommendations);
         }
         
         return recommendations;

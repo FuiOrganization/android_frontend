@@ -50,7 +50,7 @@
 
             <ImageView
                 android:id="@+id/experience_box_ic_pin"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 app:srcCompat="@drawable/ic_pin" />
