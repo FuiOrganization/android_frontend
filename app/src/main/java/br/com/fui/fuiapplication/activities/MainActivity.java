@@ -45,6 +45,7 @@ import br.com.fui.fuiapplication.models.Experience;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    private Screen currentScreen = Screen.MainScreen;
     Intent loginIntent;
     private TextView mTextMessage;
     public static GridView gridHistory;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SwipeRefreshLayout experienceSwipeRefresh;
     private SwipeRefreshLayout historySwipeRefresh;
     private View headerLayout;
+
+    public enum Screen { MainScreen, History }
 
     //NAVIGATION ITEMS
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -179,14 +182,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
             );
-
-
         }
+
+        //CURRENT SCREEN
+        if(this.currentScreen == Screen.MainScreen){
+            showMainScreen();
+        }else if(this.currentScreen == Screen.History){
+            showHistory();
+        }
+
     }
 
     /*========================================MESSAGES========================================*/
 
     private void showMainScreen(){
+        this.currentScreen = Screen.MainScreen;
         showNoMessage();
         experienceSwipeRefresh.setVisibility(View.VISIBLE);
         gridRecommendations.setVisibility(View.VISIBLE);
@@ -195,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showHistory(){
+        this.currentScreen = Screen.History;
         hideMainScreen();
         historySwipeRefresh.setVisibility(View.VISIBLE);
         gridHistory.setVisibility(View.VISIBLE);
