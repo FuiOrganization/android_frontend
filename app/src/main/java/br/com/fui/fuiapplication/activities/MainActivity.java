@@ -446,9 +446,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 showNoMessage();
                 //TODO gridHistory Update
 
-                /*for(Checkin c : history){
+                for(Checkin c : history){
                     Log.d("checkin", c.getExperienceId()+" "+c.getExperienceName()+" "+c.getCreatedAt());
-                }*/
+                }
             }
 
             //cancel animation

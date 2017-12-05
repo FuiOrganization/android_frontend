@@ -38,11 +38,12 @@ public class ExperienceConnector {
                 JSONArray jsonArray = new JSONArray(response.getBody());
 
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject object = jsonArray.getJSONObject(i);
+                    JSONObject checkin = jsonArray.getJSONObject(i);
+                    JSONObject experience = checkin.getJSONObject("experience");
                     Checkin c = new Checkin(
-                            object.getInt("experience_id"),
-                            "Experience Name",
-                            new Date(sdf.parse(object.getString("created_at").substring(0, 19)).getTime())
+                            checkin.getInt("experience_id"),
+                            experience.getString("name"),
+                            new Date(sdf.parse(checkin.getString("created_at").substring(0, 19)).getTime())
                     );
                     history.add(c);
                 }
