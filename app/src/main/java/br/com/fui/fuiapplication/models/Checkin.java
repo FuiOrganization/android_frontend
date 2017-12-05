@@ -1,5 +1,6 @@
 package br.com.fui.fuiapplication.models;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -7,35 +8,22 @@ import java.util.Date;
  */
 
 public class Checkin {
-    private int experienceId;
-    private String experienceName;
+    private Experience experience;
     private Date createdAt;
+    private static final SimpleDateFormat defaultDateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
 
-    public Checkin(int experienceId, String experienceName, Date createdAt) {
-        this.experienceId = experienceId;
-        this.experienceName = experienceName;
+    public Checkin(int experienceId, String experienceName, String experienceDescription, String experienceImage, Date createdAt) {
+        this.experience = new Experience(experienceId, experienceName, experienceDescription, experienceImage, false, true);
         this.createdAt = createdAt;
     }
 
-    public int getExperienceId() {
-        return experienceId;
-    }
+    public Experience getExperience() { return experience; }
 
-    public void setExperienceId(int experienceId) {
-        this.experienceId = experienceId;
-    }
+    public void setExperience(Experience experience) { this.experience = experience; }
 
-    public String getExperienceName() {
-        return experienceName;
-    }
+    public Date getCreatedAt() { return createdAt; }
 
-    public void setExperienceName(String experienceName) {
-        this.experienceName = experienceName;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
+    public String getFormattedDate(){ return defaultDateFormat.format(this.getCreatedAt()); }
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;

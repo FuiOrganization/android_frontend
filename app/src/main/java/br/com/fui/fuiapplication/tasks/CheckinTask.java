@@ -6,10 +6,13 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.BaseAdapter;
 
+import java.util.Date;
+
 import br.com.fui.fuiapplication.R;
 import br.com.fui.fuiapplication.activities.MainActivity;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
 import br.com.fui.fuiapplication.data.Data;
+import br.com.fui.fuiapplication.models.Checkin;
 import br.com.fui.fuiapplication.models.Experience;
 
 /**
@@ -36,15 +39,20 @@ public class CheckinTask extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(final Boolean result) {
         if (result) {
             //if user had not visited until now
-            if(!this.experience.hasUserVisited()){
+            if (!this.experience.hasUserVisited()) {
                 //exchange current experience for real experience
                 this.experience = this.getRealExperienceObject();
                 //change visited param
                 this.experience.setUserVisited(true);
+                //notify adapter
+                ((BaseAdapter) MainActivity.gridRecommendations.getAdapter()).notifyDataSetChanged();
             }
 
+            //add to history
+            Data.addNewCheckinToHistory(this.experience);
+
             //notify adapter
-            ((BaseAdapter) MainActivity.gridRecommendations.getAdapter()).notifyDataSetChanged();
+            ((BaseAdapter) MainActivity.gridHistory.getAdapter()).notifyDataSetChanged();
 
             //show result to user
             Snackbar.make(view, R.string.fui_success_message, Snackbar.LENGTH_LONG)
@@ -58,12 +66,13 @@ public class CheckinTask extends AsyncTask<Void, Void, Boolean> {
     /**
      * the class' experience object is a clone of the real object because of serialization between activities
      * therefore if you intent to change the object, you must get the real one reference first
+     *
      * @return real Experience object
      */
-    private Experience getRealExperienceObject(){
-        if(this.realExperienceObject) return this.experience;
-        for(Experience e2 : Data.recommendations){
-            if(this.experience.getId()==e2.getId()){
+    private Experience getRealExperienceObject() {
+        if (this.realExperienceObject) return this.experience;
+        for (Experience e2 : Data.recommendations) {
+            if (this.experience.getId() == e2.getId()) {
                 this.realExperienceObject = true;
                 return e2;
             }

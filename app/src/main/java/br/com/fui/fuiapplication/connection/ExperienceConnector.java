@@ -43,6 +43,8 @@ public class ExperienceConnector {
                     Checkin c = new Checkin(
                             checkin.getInt("experience_id"),
                             experience.getString("name"),
+                            experience.getString("description"),
+                            experience.getString("image_url"),
                             new Date(sdf.parse(checkin.getString("created_at").substring(0, 19)).getTime())
                     );
                     history.add(c);

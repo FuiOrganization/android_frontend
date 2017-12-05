@@ -31,6 +31,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import br.com.fui.fuiapplication.R;
+import br.com.fui.fuiapplication.adapters.CheckinHistoryAdapter;
 import br.com.fui.fuiapplication.adapters.ExperienceBoxImageAdapter;
 import br.com.fui.fuiapplication.cache.DiskCache;
 import br.com.fui.fuiapplication.connection.ExperienceConnector;
@@ -46,11 +47,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     Intent loginIntent;
     private TextView mTextMessage;
-    public static  GridView gridRecommendations;
+    public static GridView gridHistory;
+    public static GridView gridRecommendations;
     private Intent experienceIntent;
     private GetRecommendations getRecommendationsTask;
     private GetHistory getHistoryTask;
     private SwipeRefreshLayout experienceSwipeRefresh;
+    private SwipeRefreshLayout historySwipeRefresh;
     private View headerLayout;
 
     //NAVIGATION ITEMS
@@ -68,8 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     hideMainScreen();
                     return true;
                 case R.id.navigation_history:
-                    showMessage(R.string.title_history);
-                    hideMainScreen();
+                    showHistory();
                     checkHistory();
                     return true;
             }
@@ -138,13 +140,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
 
-            //SWIPE REFRESH
+            //EXPERIENCE SWIPE REFRESH
             experienceSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.experience_swipe_refresh);
             //if recommendations are not loaded yet, start animation
             if (Data.recommendations == null || Data.recommendations.size() == 0) {
                 experienceSwipeRefresh.setRefreshing(true);
             }
-            //on swipe to refresh
+
+            //Experience: on swipe to refresh
             experienceSwipeRefresh.setOnRefreshListener(
                     new SwipeRefreshLayout.OnRefreshListener() {
                         @Override
@@ -154,6 +157,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
             );
 
+            //HISTORY
+            gridHistory = (GridView) findViewById(R.id.grid_history);
+            gridHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    experienceIntent.putExtra("experience", ((Checkin) gridHistory.getAdapter().getItem(position)).getExperience());
+                    startActivity(experienceIntent);
+                }
+            });
+
+            //HISTORY SWIPE REFRESH
+            historySwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.history_swipe_refresh);
+
+            //Experience: on swipe to refresh
+            historySwipeRefresh.setOnRefreshListener(
+                    new SwipeRefreshLayout.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            updateHistory();
+                        }
+                    }
+            );
+
+
         }
     }
 
@@ -161,13 +188,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showMainScreen(){
         showNoMessage();
-        gridRecommendations.setVisibility(View.VISIBLE);
         experienceSwipeRefresh.setVisibility(View.VISIBLE);
+        gridRecommendations.setVisibility(View.VISIBLE);
+        historySwipeRefresh.setVisibility(View.GONE);
         mTextMessage.setTextColor(getResources().getColor(R.color.black));
     }
 
+    private void showHistory(){
+        hideMainScreen();
+        historySwipeRefresh.setVisibility(View.VISIBLE);
+        gridHistory.setVisibility(View.VISIBLE);
+    }
+
     private void hideMainScreen(){
-        gridRecommendations.setVisibility(View.GONE);
+        showNoMessage();
         experienceSwipeRefresh.setVisibility(View.GONE);
     }
 
@@ -364,6 +398,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ArrayList<Experience> cachedExperiences = CustomSharedPreferences.getRecommendations();
                     if(cachedExperiences != null){
                         Data.recommendations = cachedExperiences;
+                        MainActivity.gridRecommendations.setVisibility(View.VISIBLE);
                         MainActivity.gridRecommendations.setAdapter(new ExperienceBoxImageAdapter(MainActivity.this, Data.recommendations));
                     }
                 }else{
@@ -390,6 +425,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void checkHistory(){
         if(Data.history == null){
             updateHistory();
+        }else{
+            MainActivity.gridHistory.setAdapter(new CheckinHistoryAdapter(MainActivity.this, Data.history));
         }
     }
 
@@ -436,23 +473,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ArrayList<Checkin> cachedHistory = CustomSharedPreferences.getHistory();
                     if(cachedHistory != null){
                         Data.history = cachedHistory;
-                        //TODO gridHistory update
+                        MainActivity.gridHistory.setVisibility(View.VISIBLE);
+                        MainActivity.gridHistory.setAdapter(new CheckinHistoryAdapter(MainActivity.this, Data.history));
                     }
                 }else{
                     showNoDataErrorMessage();
-                    //TODO gridHistory GONE
+                    MainActivity.gridHistory.setVisibility(View.GONE);
                 }
             } else {
                 showNoMessage();
-                //TODO gridHistory Update
-
-                for(Checkin c : history){
-                    Log.d("checkin", c.getExperienceId()+" "+c.getExperienceName()+" "+c.getCreatedAt());
-                }
+                MainActivity.gridHistory.setVisibility(View.VISIBLE);
+                MainActivity.gridHistory.setAdapter(new CheckinHistoryAdapter(MainActivity.this, Data.history));
             }
 
             //cancel animation
-            experienceSwipeRefresh.setRefreshing(false);
+            historySwipeRefresh.setRefreshing(false);
 
         }
 

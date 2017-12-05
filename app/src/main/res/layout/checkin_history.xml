@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/experience_box"
+    android:id="@+id/checkin_history"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
@@ -19,14 +19,14 @@
 
         <RelativeLayout
             android:id="@+id/checkin_history_relative_layout"
-            android:layout_width="40dp"
-            android:layout_height="40dp">
+            android:layout_width="120dp"
+            android:layout_height="120dp">
 
             <ImageView
                 android:id="@+id/checkin_history_image"
                 android:scaleType="centerCrop"
-                android:layout_width="40dp"
-                android:layout_height="40dp"/>
+                android:layout_width="120dp"
+                android:layout_height="120dp"/>
 
         </RelativeLayout>
 
@@ -40,9 +40,19 @@
             <TextView
                 android:id="@+id/checkin_history_title"
                 android:gravity="left"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:text="Teste"
+                android:paddingTop="5dp"
+                android:paddingLeft="5dp"
+                android:paddingBottom="2dp"
+                android:textSize="18sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/checkin_history_date"
+                android:gravity="left"
+                android:paddingTop="2dp"
+                android:paddingLeft="5dp"
+                android:paddingBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

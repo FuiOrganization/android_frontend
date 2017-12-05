@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import br.com.fui.fuiapplication.models.Checkin;
 import br.com.fui.fuiapplication.models.Experience;
@@ -30,6 +31,11 @@ public class Data {
     public static String name = "";
     public static String email = "";
     public static String profilePic = "";
+
+    public static void addNewCheckinToHistory(Experience experience){
+        Checkin new_checkin = new Checkin(experience.getId(), experience.getTitle(), experience.getDescription(), experience.getImage(), new Date());
+        history.add(0, new_checkin);
+    }
 
     private static String createProfilePicUrl(String userId){
         return "https://graph.facebook.com/" + userId + "/picture?type=large";
